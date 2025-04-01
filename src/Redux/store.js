@@ -1,9 +1,16 @@
 import { applyMiddleware, combineReducers, legacy_createStore } from "redux";
 import { thunk } from "redux-thunk"; // Sử dụng destructuring để import
 import { authReducer } from "./Auth/auth.reducer";
+import postReducer from "./Post/post.reducer";
+
+import  messageReducer  from "./Message/message.reducer";
+import { userReducer } from "./Users/user.reducer";
 
 const rootReducers = combineReducers({
-    auth: authReducer
+    auth: authReducer,
+    posts: postReducer,
+    stories: userReducer,
+    message: messageReducer
 });
 
 // Tạo store với middleware

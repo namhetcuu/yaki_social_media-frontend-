@@ -1,7 +1,7 @@
 //Đây là một Redux reducer dùng để xử lý trạng thái xác thực (authentication) của ứng dụng,
 //bao gồm đăng nhập (login) và đăng ký (register).
 
-import { LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, REGISTER_FAILURE, REGISTER_SUCCESS,GET_PROFILE_REQUEST,GET_PROFILE_SUCCESS, REGISTER_REQUEST } from "./auth.actionType";
+import { LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, REGISTER_FAILURE, REGISTER_SUCCESS,GET_PROFILE_REQUEST,GET_PROFILE_SUCCESS, REGISTER_REQUEST, SEARCH_USER_SUCCESS } from "./auth.actionType";
 //📌 Dòng chảy dữ liệu:
 // UI (Giao diện người dùng) gọi action
 // Khi người dùng nhập thông tin đăng nhập và nhấn nút "Đăng nhập", một action (loginUserAction) sẽ được gọi.
@@ -20,7 +20,8 @@ const initialState = {
     jwt: null,
     error: null,
     loading: false,
-    user: null
+    user: null,
+    searchUser: []
 }
 export const authReducer = (state = initialState, action) => {
     switch (action.type) {
@@ -48,6 +49,10 @@ export const authReducer = (state = initialState, action) => {
 
         case GET_PROFILE_SUCCESS:{
             return {...state,user:action.payload.result,error:null,loading:false}
+        }
+
+        case SEARCH_USER_SUCCESS:{
+            return {...state,searchUser:action.payload.result,loading:false,error:null}
         }
 
         case LOGIN_SUCCESS:

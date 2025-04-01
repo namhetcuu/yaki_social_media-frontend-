@@ -1,9 +1,10 @@
-import { Avatar, Box, Button, Card, Tab, Tabs } from '@mui/material';
-import React from 'react';
-import { useSelector } from 'react-redux';
+import { Avatar, Box, Button, Card, Tab, Tabs, Modal, Fade, IconButton } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Close } from '@mui/icons-material';
 import PostCard from '../../components/Post/PostCard';
-import UserReelCard from '../../components/Reels/UserReelCard';
 import ProfileModal from './ProfileModal';
+import { getUsersPostAction } from '../../Redux/Post/post.action';
 
 const tabs = [
   { value: 'post', name: 'Posts' },
@@ -13,108 +14,98 @@ const tabs = [
 ];
 
 const Profile = () => {
-  //Biến value quản lý tab hiện tại, mặc định là post.
-  const [value, setValue] = React.useState('post');
-  //Biến open kiểm soát trạng thái modal chỉnh sửa hồ sơ.
-  const [open, setOpen] = React.useState(false);
-  //Lấy thông tin user từ Redux store.
+  const dispatch = useDispatch();
+  const [value, setValue] = useState('post');
+  const [open, setOpen] = useState(false);
   const auth = useSelector((state) => state.auth);
-  
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleChange = (event, newValue) => setValue(newValue);
 
   const user = auth.user || { firstName: 'Guest', lastName: 'User' };
+  const userId = user.id;
+  const userPosts = useSelector((state) => state.posts?.userPosts || []);
+
+  useEffect(() => {
+    if (userId) {
+      console.log("🚀 Fetching user posts for userId:", userId);
+      dispatch(getUsersPostAction(userId));
+    }
+  }, [dispatch, userId]);
+
+  useEffect(() => {
+    console.log("📌 Updated userPosts:", userPosts);
+  }, [userPosts]);
 
   return (
     <Card className="my-10 w-[95%]">
       <div className="rounded-md">
-        {/* Ảnh bìa */}
         <div className="h-[15rem]">
-          <img
-            className="w-full h-full rounded-t-md"
-            src="https://images.pexels.com/photos/31120801/pexels-photo-31120801/free-photo-of-phong-c-nh-bai-bi-n-tuy-t-d-p-v-i-d-o-rocky.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
-            alt="cover"
-          />
+          <img className="w-full h-full rounded-t-md" src="https://images.pexels.com/photos/31120801/pexels-photo-31120801/free-photo-of-phong-c-nh-bai-bi-n-tuy-t-d-p-v-i-d-o-rocky.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" alt="cover" />
         </div>
 
-        {/* Avatar và nút Edit */}
         <div className="px-5 flex justify-between items-start mt-5 h-[5rem]">
-          <Avatar
-            className="transform -translate-y-24"
-            sx={{ width: '10rem', height: '10rem' }}
-            src="https://images.pexels.com/photos/18166547/pexels-photo-18166547/free-photo-of-bi-n-k-ngh-dan-ba-b-bi-n.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
-          />
-          <Button sx={{ borderRadius: '20rem' }} variant="outlined" onClick={handleOpen}>
+          <Avatar className="transform -translate-y-24" sx={{ width: '10rem', height: '10rem' }} src="https://images.pexels.com/photos/18166547/pexels-photo-18166547/free-photo-of-bi-n-k-ngh-dan-ba-b-bi-n.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" />
+          <Button
+            sx={{ borderRadius: '20rem', transition: '0.3s', '&:hover': { transform: 'scale(1.05)' }, '&:active': { transform: 'scale(0.95)' } }}
+            variant="outlined"
+            onClick={handleOpen}
+          >
             Edit Profile
           </Button>
         </div>
 
-        {/* Thông tin cá nhân */}
         <div className="p-5">
-          <div className="text-left w-full">
-            <h1 className="py-1 font-bold text-2xl">{`${user.firstName} ${user.lastName}`}</h1>
-            <p>@{`${user.firstName}-${user.lastName}`.toLowerCase()}</p>
-          </div>
-
+          <h1 className="py-1 font-bold text-2xl">{`${user.firstName} ${user.lastName}`}</h1>
+          <p>@{`${user.firstName}-${user.lastName}`.toLowerCase()}</p>
           <div className="flex gap-5 items-center py-3">
             <span>41 posts</span>
             <span>35 followers</span>
             <span>5 followings</span>
           </div>
-
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora minima dolorem vel, rerum porro fugit iure nesciunt culpa sint magni molestias tempore, libero omnis odit labore repellat in illum laborum?
-          </p>
+          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit...</p>
         </div>
 
-        {/* Tabs */}
-        <section>
-          <Box sx={{ width: '100%', borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={value} onChange={handleChange} aria-label="wrapped label tabs example">
-              {tabs.map((item) => (
-                <Tab key={item.value} value={item.value} label={item.name} />
-              ))}
-            </Tabs>
-          </Box>
+        <Box sx={{ width: '100%', borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={value} onChange={handleChange} aria-label="wrapped label tabs example">
+            {tabs.map((item) => (
+              <Tab key={item.value} value={item.value} label={item.name} />
+            ))}
+          </Tabs>
+        </Box>
 
-          {/* Nội dung theo Tab */}
-          <div className="flex justify-center my-10">
-          {/* Nếu value === 'saved', React sẽ hiển thị: */}
-            {value === 'post' && (
-              <div className="space-y-5 w-[95%]">
-                {[...Array(4)].map((_, index) => (
-                  <div key={index} className="border border-gray-200 rounded-md">
-                    <PostCard />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {value === 'reels' && (
-              <div className="flex justify-between flex-wrap gap-2">
-                {[...Array(4)].map((_, index) => (
-                  <UserReelCard key={index} />
-                ))}
-              </div>
-            )}
-
-            {value === 'saved' && (
-              <div className="space-y-5 w-[70%]">
-                {[...Array(4)].map((_, index) => (
-                  <div key={index} className="border border-gray-200 rounded-md">
-                    <PostCard />
-                  </div>
-                ))}
-              </div>
-            )}
-            
-          </div>
-        </section>
+        <div className="flex justify-center my-10">
+          {value === 'post' && (
+            <div className="space-y-5 w-[95%]">
+              {Array.isArray(userPosts) && userPosts.length > 0 ? (
+                userPosts.map((post) => (
+                  post ? (
+                    <div key={post.id} className="border border-gray-200 rounded-md">
+                      <PostCard item={post} />
+                    </div>
+                  ) : (
+                    <p key={Math.random()} className="text-center text-red-500">Lỗi: Bài viết không hợp lệ</p>
+                  )
+                ))
+              ) : (
+                <p className="text-center">Người dùng chưa có bài viết nào.</p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Modal chỉnh sửa hồ sơ */}
-      <ProfileModal open={open} handleClose={handleClose} user={user}/>
+      <Modal open={open} onClose={handleClose} closeAfterTransition>
+        <Fade in={open}>
+          <div className="bg-white p-5 rounded-lg shadow-lg w-[400px] mx-auto mt-20 relative">
+            <IconButton onClick={handleClose} className="absolute top-2 right-2">
+              <Close />
+            </IconButton>
+            <ProfileModal open={open} handleClose={handleClose} user={user} />
+          </div>
+        </Fade>
+      </Modal>
     </Card>
   );
 };

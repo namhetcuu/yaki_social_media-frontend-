@@ -1,0 +1,8 @@
+.hiderScrollBar::-webkit-scrollbar{
+    width: 0;
+    display: none;
+    height: 0;
+  }
+.hiderScrollBar::-webkit-scrollbar-track{
+    display: none;
+}

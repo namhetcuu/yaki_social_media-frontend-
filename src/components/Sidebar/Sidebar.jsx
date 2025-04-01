@@ -47,14 +47,16 @@ const Sidebar = () => {
   };
   
   const handleClose = () => {
-    setAnchorEl(null);
+    localStorage.removeItem("jwt"); // Xóa token
+    dispatch({ type: "LOGOUT" }); // Nếu có action logout trong Redux, gọi nó
+    navigate("/login"); // Chuyển hướng về trang đăng nhập
   };
 
   return (
     <Card className='h-screen flex flex-col justify-between py-5' style={{ padding: 5 }}>
       <div className='space-y-8 pl-5'>
-        <div>
-          <span className='font-bold text-2xl'>Yaki Social</span>
+        <div className='text-center'>
+          <span className='font-bold text-5xl'>Yaki</span>
         </div>
 
         <div className='space-y-6'>
@@ -103,8 +105,7 @@ const Sidebar = () => {
               onClose={handleClose}
               MenuListProps={{ 'aria-labelledby': 'basic-button' }}
             >
-              <MenuItem onClick={() => { handleClose(); navigate('/home/profile'); }}>Profile</MenuItem>
-              <MenuItem onClick={handleClose}>My account</MenuItem>
+              <MenuItem onClick={() => { handleClose(); navigate(`/home/profile/${userId}`); }}>Profile</MenuItem>
               <MenuItem onClick={handleClose}>Logout</MenuItem>
             </Menu>
           </div>

@@ -55,7 +55,7 @@ function App() {
   }, [user, location.pathname, navigate]);
 
   return (
-    <div className='w-[100vw] h-[100vh]'>
+    <div className='w-[100vw] h-[100vh] '>
       {/* Authentication: Trang chứa đăng nhập & đăng ký.
       HomePage: Trang chủ.
       Message: Trang tin nhắn.
