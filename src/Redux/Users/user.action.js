@@ -41,32 +41,35 @@ export const getStoriesAction = () => async (dispatch) => {
 };
 
 export const getUsersByIds = (userIds) => async (dispatch, getState) => {
-  if (!userIds || userIds.length === 0) return; // ⛔ Không gửi request nếu userIds rỗng
-  
+  if (!userIds || userIds.length === 0) {
+      console.log('No userIds provided, skipping request');
+      return;
+  }
+  console.log('Starting getUsersByIds with userIds:', userIds);
   dispatch({ type: GET_USERS_REQUEST });
-
   try {
-    const { auth } = getState();  
-    const token = auth?.userToken || localStorage.getItem("jwt"); // ✅ Lấy token từ Redux hoặc localStorage
-
-    if (!token) {
-      throw new Error("Unauthorized: No token provided");
-    }
-
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
-    const { data } = await api.post(`/users/get-by-ids`, { userIds }, config); // ✅ Truyền config
-
-    console.log("User details:", data);
-
-    dispatch({ type: GET_USERS_SUCCESS, payload: data });
+      const { auth } = getState();
+      const token = auth?.userToken || localStorage.getItem("jwt");
+      console.log('Token checked in getUsersByIds:', token);
+      if (!token) {
+          throw new Error("Unauthorized: No token provided");
+      }
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      const userPromises = userIds.map(async (id) => {
+          console.log(`Fetching user with ID: ${id}`);
+          const { data } = await api.get(`/users/${id}`);
+          console.log(`User details for ${id} from API:`, data);
+          return { [id]: data.result || data };
+      });
+      const userResults = await Promise.all(userPromises);
+      const payload = Object.assign({}, ...userResults);
+      console.log('Payload to dispatch:', payload);
+      dispatch({ type: GET_USERS_SUCCESS, payload });
+      // return { type: GET_USERS_SUCCESS, payload };
   } catch (error) {
-    console.error("❌ Get Users Error:", error.response?.data?.message || error.message);
-    dispatch({ type: GET_USERS_FAILURE, payload: error.message });
+      console.error("❌ Get Users Error:", error.response?.data?.message || error.message);
+      dispatch({ type: GET_USERS_FAILURE, payload: error.message });
+      throw error;
   }
 };
 

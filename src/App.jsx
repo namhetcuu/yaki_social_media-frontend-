@@ -9,9 +9,11 @@ import MiddlePart from './components/MiddlePart/MiddlePart';
 import { Outlet } from 'react-router-dom';
 import Login from './pages/Authentication/login';
 import Register from './pages/Authentication/register';
+import ChatWithAI from './pages/ChatWithAI/ChatWithAI';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { checkAuthStatus } from './Redux/Auth/auth.action';
+import ContextProvider from './pages/ChatWithAI/Context';
 
 function HomeLayout() {
   return <HomePage><Outlet /></HomePage>;
@@ -41,12 +43,14 @@ function App() {
   useEffect(() => {
     const jwt = localStorage.getItem("jwt");
 
-    if (!jwt) {
-      navigate("/login"); // ❌ Nếu không có JWT, bắt buộc về login
+    if (!jwt && location.pathname === "/") {
+      navigate("/login"); // Chuyển hướng đến /login nếu không có JWT và đang ở "/"
+    } else if (!jwt) {
+      navigate("/login"); // Chuyển hướng đến /login nếu không có JWT ở bất kỳ route nào
     } else if (!user) {
-      dispatch(checkAuthStatus()); // 🔄 Nếu có JWT nhưng chưa có user, gọi API lấy user
+      dispatch(checkAuthStatus()); // Nếu có JWT nhưng chưa có user, gọi lại checkAuthStatus
     }
-  }, [user, navigate, dispatch]);
+  }, [user, navigate, dispatch, location.pathname]); // Thêm location.pathname vào dependencies
 
   useEffect(() => {
     if (user && location.pathname === "/") {
@@ -72,6 +76,12 @@ function App() {
         </Route>
         
         <Route path='/message' element={<Message />} />
+        <Route path='/chatwithai' element={
+          <ContextProvider>
+            <ChatWithAI />
+          </ContextProvider>
+          } 
+          />
 
         {/* Home Layout chứa các route con */}
         <Route path='/home' element={<HomeLayout />}>

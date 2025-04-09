@@ -10,9 +10,9 @@ import ExploreIcon from '@mui/icons-material/Explore';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MessageIcon from '@mui/icons-material/Message';
-import ListAltIcon from '@mui/icons-material/ListAlt';
 import GroupIcon from '@mui/icons-material/Group';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import Face5Icon from '@mui/icons-material/Face5';
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -37,7 +37,7 @@ const Sidebar = () => {
     { title: 'Create Reels', icon: <ControlPointIcon />, path: '/home/create-reels' },
     { title: 'Notifications', icon: <NotificationsIcon />, path: '/notifications' },
     { title: 'Message', icon: <MessageIcon />, path: '/message' },
-    { title: 'Lists', icon: <ListAltIcon />, path: '/lists' },
+    { title: 'Chat with AI', icon: <Face5Icon />, path: '/chatwithai' },
     { title: 'Communities', icon: <GroupIcon />, path: '/communities' },
     { title: 'Profile', icon: <AccountCircleIcon />, path: `/home/profile/${userId}` },
   ];
@@ -56,7 +56,8 @@ const Sidebar = () => {
     <Card className='h-screen flex flex-col justify-between py-5' style={{ padding: 5 }}>
       <div className='space-y-8 pl-5'>
         <div className='text-center'>
-          <span className='font-bold text-5xl'>Yaki</span>
+          <span className='font-bold text-5xl' 
+          >Yaki</span>
         </div>
 
         <div className='space-y-6'>

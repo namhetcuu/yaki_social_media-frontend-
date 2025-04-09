@@ -9,18 +9,15 @@ const SearchUser = () => {
   const dispatch = useDispatch();
   
   // Lấy dữ liệu từ Redux
-  const { auth } = useSelector((store) => store);
+  const { message,auth } = useSelector((store) => store);
   const currentUser = auth.user; // Người gửi
-  const searchResults = auth.searchUser || []; // Danh sách user tìm kiếm
+  //const searchResults = auth.searchUser || []; // Danh sách user tìm kiếm
 
   // Gửi API tìm kiếm user
   const handleSearchUser = (e) => {
     const value = e.target.value;
     setUsername(value);
-    
-    if (value.trim()) {
-      dispatch(searchUser(value));
-    }
+    dispatch(searchUser(username));
   };
 
   // Gọi API tạo chat
@@ -55,19 +52,18 @@ const SearchUser = () => {
         />
 
         {/* Hiển thị danh sách user tìm kiếm */}
-        {username && searchResults.length > 0 && (
-          <div className="absolute w-full z-10 top-[4.5rem] bg-white shadow-lg rounded-lg">
-            {searchResults.map((item) => (
-              <Card key={item.id} className="cursor-pointer">
-                <CardHeader
-                  onClick={() => handleClick(item.id)}
-                  avatar={<Avatar src={item.avatar || "https://via.placeholder.com/50"} />}
-                  title={`${item.firstName} ${item.lastName}`}
-                  subheader={item.firstName.toLowerCase() + " " + item.lastName.toLowerCase()}
-                />
-              </Card>
-            ))}
-          </div>
+        {username && auth.searchUser.map((item) => 
+          <Card key={item.id} className="absolute w-full z-10 top-[4.5rem] bg-white shadow-lg rounded-lg">
+            <CardHeader
+              onClick={() => {
+                handleClick(item.id);
+                setUsername(""); // Xóa ô tìm kiếm sau khi chọn user
+              }}
+              avatar={<Avatar src={item.avatar || "https://via.placeholder.com/50"} />}
+              title={`${item.firstName} ${item.lastName}`}
+              subheader={item.firstName.toLowerCase() + " " + item.lastName.toLowerCase()}
+            />
+          </Card>
         )}
       </div>
     </div>

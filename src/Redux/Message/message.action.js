@@ -1,16 +1,64 @@
 import { api } from "../../config/api"; 
 import * as actionType from "../Message/message.actionType";
-export const createMessage = (message)=>async(dispatch)=>{
+export const createMessage = (reqData)=>async(dispatch, getState)=>{
     dispatch({type:actionType.CREATE_MESSAGE_REQUEST})
 
     try {
-        const {data} = await api.post(`/message`,message)
+        const state = getState();
+        const token = state.auth?.userToken || localStorage.getItem("jwt");
+
+        if (!token) {
+            throw new Error("Unauthorized: No token provided");
+        }
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        };
+
+        const {data} = await api.post(`/message`,reqData,config)
+
+        //reqData.sendMessageToServer(data)
+
         console.log("create message: ", data);
-        dispatch({type:actionType.CREATE_MESSAGE_SUCCESS,payload:data})
+        dispatch({type:actionType.CREATE_MESSAGE_SUCCESS,payload:data.result})
+
+        return { payload: data.result, success: true };
         
     } catch (error) {
         console.error("Lỗi khi tạo bài viết:", error.response?.data?.message || error.message);
         dispatch({ type: actionType.CREATE_MESSAGE_FAILURE, payload: error.response?.data?.message || error.message });
+    }
+}
+
+export const getMessages = (chatId)=>async(dispatch, getState)=>{
+    dispatch({type:actionType.GET_MESSAGES_REQUEST})
+
+    try {
+        const state = getState();
+        const token = state.auth?.userToken || localStorage.getItem("jwt");
+
+        if (!token) {
+            throw new Error("Unauthorized: No token provided");
+        }
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        };
+
+        const {data} = await api.get(`/message/chat-messages/${chatId}`,config)
+        console.log("get messages: ", data);
+        dispatch({type:actionType.GET_MESSAGES_SUCCESS,payload:data.result})
+        return { messages: data.result }; 
+
+    } catch (error) {
+        console.error("Lỗi khi lấy danh sách bài viết:", error.response?.data?.message || error.message);
+        dispatch({ type: actionType.GET_MESSAGES_FAILURE, payload: error.response?.data?.message || error.message });
     }
 }
 
@@ -89,7 +137,7 @@ export const getAllChats = (userId)=>async(dispatch, getState)=>{
         const {data} = await api.get(`/chat/user/${userId}`, config)
         console.log("get all chats: ", data);
         dispatch({type:actionType.GET_ALL_CHATS_SUCCESS,payload:data.result})
-        
+        return { payload: data.result };
     } catch (error) {
         console.error("Lỗi khi lay danh sach chat:", error.response?.data?.message || error.message);
         dispatch({ type: actionType.GET_ALL_CHATS_FAILURE, payload: error.response?.data?.message || error.message });

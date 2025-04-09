@@ -22,7 +22,7 @@ const MiddlePart = () => {
   const handleCloseCreatePostModal = () => setOpenCreatePostModal(false);
   const handleOpenCreatePostModal = () => setOpenCreatePostModal(true);
 
-  const { stories, loading: storiesLoading } = useSelector((state) => state.stories);
+  // const { stories, loading: storiesLoading } = useSelector((state) => state.stories);
 
   const fetchPosts = useCallback(() => {
     if (token) {
@@ -34,9 +34,9 @@ const MiddlePart = () => {
     fetchPosts();
   }, [fetchPosts]);
 
-  useEffect(() => {
-    dispatch(getStoriesAction()); // Lấy danh sách Stories
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(getStoriesAction()); // Lấy danh sách Stories
+  // }, [dispatch]);
 
   return (
     <div className="px-10 w-full bg-[#f8f9fa] dark:bg-[#1c1e21] min-h-screen">
@@ -81,7 +81,7 @@ const MiddlePart = () => {
           </Avatar>
           <p className="text-black dark:text-white">Create Reels</p>
         </div>
-        {storiesLoading ? (
+        {/* {storiesLoading ? (
             <p>Đang tải...</p>
           ) : stories?.length > 0 ? (
             stories.map((story, index) => (
@@ -89,7 +89,7 @@ const MiddlePart = () => {
             ))
           ) : (
             <p>Không có story nào.</p>
-          )}
+          )} */}
 
       </section>
 
