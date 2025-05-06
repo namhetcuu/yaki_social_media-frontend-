@@ -46,7 +46,7 @@ const Profile = () => {
         </div>
 
         <div className="px-5 flex justify-between items-start mt-5 h-[5rem]">
-          <Avatar className="transform -translate-y-24" sx={{ width: '10rem', height: '10rem' }} src="https://images.pexels.com/photos/18166547/pexels-photo-18166547/free-photo-of-bi-n-k-ngh-dan-ba-b-bi-n.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" />
+          <Avatar className="transform -translate-y-24" sx={{ width: '10rem', height: '10rem' }} src={`${user.profilePicture}`} />
           <Button
             sx={{ borderRadius: '20rem', transition: '0.3s', '&:hover': { transform: 'scale(1.05)' }, '&:active': { transform: 'scale(0.95)' } }}
             variant="outlined"

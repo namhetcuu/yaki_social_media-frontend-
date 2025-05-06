@@ -136,7 +136,7 @@ export const getAllChats = (userId)=>async(dispatch, getState)=>{
 
         const {data} = await api.get(`/chat/user/${userId}`, config)
         console.log("get all chats: ", data);
-        dispatch({type:actionType.GET_ALL_CHATS_SUCCESS,payload:data.result})
+        dispatch({type:actionType.GET_ALL_CHATS_SUCCESS,payload:data.result})//payload is array
         return { payload: data.result };
     } catch (error) {
         console.error("Lỗi khi lay danh sach chat:", error.response?.data?.message || error.message);

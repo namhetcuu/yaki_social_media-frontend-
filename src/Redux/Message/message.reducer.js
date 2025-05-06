@@ -4,7 +4,7 @@ const initialState = {
     chats:[],
     loading: false,
     error: null,
-    message:null
+    message:null// Tin nhắn mới được tạo thành công (thường dùng để thông báo)
 }
 const messageReducer=(state=initialState, action) => {
     switch (action.type) {
@@ -19,14 +19,14 @@ const messageReducer=(state=initialState, action) => {
  
             
         case actionType.CREATE_CHAT_SUCCESS:
-            return {...state,chats:[action.payload,...state.chats]}
+            return {...state,chats:[action.payload,...state.chats]}// Thêm chat mới vào đầu danh sách chats
             
         case actionType.GET_ALL_CHATS_SUCCESS:
-            return {...state,chats:action.payload}
+            return {...state,chats:action.payload}// Cập nhật danh sách chats từ API
         case actionType.GET_MESSAGES_SUCCESS:
             return {
                 ...state,
-                messages: action.payload,  // Lưu payload từ action vào state
+                messages: action.payload,  // Lưu payload từ action vào state, Cập nhật danh sách tin nhắn trong chat hiện tại
             };
         case actionType.GET_MESSAGES_FAILURE:
             return {

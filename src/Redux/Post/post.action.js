@@ -55,7 +55,7 @@ export const getAllPostAction = () => async (dispatch) => {
         const { data } = await api.get("/posts", {
             headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("Dữ liệu API trả về:", data); // ✅ Kiểm tra dữ liệu
+        console.log("Dữ liệu API Post trả về:", data); // ✅ Kiểm tra dữ liệu
 
         if (!Array.isArray(data.result)) {
             console.error("Dữ liệu result không phải là mảng:", data.result);

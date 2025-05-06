@@ -35,7 +35,7 @@ const Sidebar = () => {
     { title: 'Home', icon: <HomeIcon />, path: '/home' },
     { title: 'Reels', icon: <ExploreIcon />, path: '/home/reels' },
     { title: 'Create Reels', icon: <ControlPointIcon />, path: '/home/create-reels' },
-    { title: 'Notifications', icon: <NotificationsIcon />, path: '/notifications' },
+    { title: 'Notifications', icon: <NotificationsIcon />, path: '/home/notifications' },
     { title: 'Message', icon: <MessageIcon />, path: '/message' },
     { title: 'Chat with AI', icon: <Face5Icon />, path: '/chatwithai' },
     { title: 'Communities', icon: <GroupIcon />, path: '/communities' },

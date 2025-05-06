@@ -3,8 +3,8 @@ import Authentication from './pages/Authentication/Authentication';
 import HomePage from './pages/HomePage/HomePage';
 import Message from './pages/Message/Message';
 import Profile from './pages/Profile/Profile';
-import Reels from './components/Reels/Reels';
-import CreateReelsForm from './components/Reels/CreateReelsForm';
+import Reels from './pages/Reels/Reels';
+import CreateReelsForm from './pages/Reels/CreateReelsForm';
 import MiddlePart from './components/MiddlePart/MiddlePart';
 import { Outlet } from 'react-router-dom';
 import Login from './pages/Authentication/login';
@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { checkAuthStatus } from './Redux/Auth/auth.action';
 import ContextProvider from './pages/ChatWithAI/Context';
+import Notification from './pages/Notification/notification';
 
 function HomeLayout() {
   return <HomePage><Outlet /></HomePage>;
@@ -36,27 +37,43 @@ function App() {
   const { user, token } = useSelector(state => state.auth);
 
   
+  //🔄 useEffect 1: Gọi kiểm tra trạng thái đăng nhập khi mở app
   useEffect(() => {
     dispatch(checkAuthStatus()); // Gọi API kiểm tra trạng thái auth khi mở app
   }, [dispatch]);
 
+  // useEffect(() => {
+  //   const jwt = localStorage.getItem("jwt");
+
+  //   if (!jwt && location.pathname === "/") {
+  //     navigate("/login"); // Chuyển hướng đến /login nếu không có JWT và đang ở "/"
+  //   } else if (!jwt) {
+  //     navigate("/login")
+  //   } else if (!user) {
+  //     dispatch(checkAuthStatus()); // Nếu có JWT nhưng chưa có user, gọi lại checkAuthStatus
+  //   }
+  // }, [user, navigate, dispatch, location.pathname]); // Thêm location.pathname vào dependencies
+
   useEffect(() => {
     const jwt = localStorage.getItem("jwt");
-
-    if (!jwt && location.pathname === "/") {
-      navigate("/login"); // Chuyển hướng đến /login nếu không có JWT và đang ở "/"
-    } else if (!jwt) {
-      navigate("/login"); // Chuyển hướng đến /login nếu không có JWT ở bất kỳ route nào
-    } else if (!user) {
-      dispatch(checkAuthStatus()); // Nếu có JWT nhưng chưa có user, gọi lại checkAuthStatus
+  
+    if (!jwt) {
+      if (location.pathname !== '/login' && location.pathname !== '/register') {
+        navigate('/login');
+      }
+    } else {
+      if (!user) {
+        dispatch(checkAuthStatus());
+      }
     }
-  }, [user, navigate, dispatch, location.pathname]); // Thêm location.pathname vào dependencies
+  }, [user, dispatch, navigate, location.pathname]);
+  
 
-  useEffect(() => {
-    if (user && location.pathname === "/") {
-      navigate("/home"); // ✅ Chỉ điều hướng nếu đang ở `/`
-    }
-  }, [user, location.pathname, navigate]);
+  // useEffect(() => {
+  //   if (user && location.pathname === "/") {
+  //     navigate("/home"); // ✅ Chỉ điều hướng nếu đang ở `/`
+  //   }
+  // }, [user, location.pathname, navigate]);
 
   return (
     <div className='w-[100vw] h-[100vh] '>
@@ -76,6 +93,7 @@ function App() {
         </Route>
         
         <Route path='/message' element={<Message />} />
+        
         <Route path='/chatwithai' element={
           <ContextProvider>
             <ChatWithAI />
@@ -88,6 +106,7 @@ function App() {
           <Route index element={<MiddlePart />} />
           <Route path='reels' element={<Reels />} />
           <Route path='create-reels' element={<CreateReelsForm />} />
+          <Route path='notifications' element={<Notification />} />
           <Route path='profile/:id' element={<Profile />} />
         </Route>
       </Routes>

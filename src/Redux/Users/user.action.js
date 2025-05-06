@@ -1,10 +1,9 @@
 import axios from "axios";
 import { API_BASE_URL } from "../../config/api";
 import {
-  GET_ALL_USERS_REQUEST,
-  GET_ALL_USERS_SUCCESS,
-  GET_ALL_USERS_FAIL,
-  GET_USERS_REQUEST,GET_USERS_SUCCESS,GET_USERS_FAILURE
+  GET_USERS_REQUEST,GET_USERS_SUCCESS,GET_USERS_FAILURE,
+   GET_ALL_STORY_USER_REQUEST, GET_ALL_STORY_USER_SUCCESS,
+    GET_ALL_STORY_USER_FAIL
 } from "./user.actionType";
 
 // 🔹 Cấu hình Axios
@@ -26,17 +25,20 @@ const setAuthHeader = () => {
   }
 };
 
+//Những action gọi API thường phải có async, await vì chúng thường trả về 1 promise, 
+// 1 promise tượng trưng cho 1 action tốn thời gian để trả dữ liệu về
+
 // 🔹 Lấy danh sách người dùng
-export const getStoriesAction = () => async (dispatch) => {
-  dispatch({ type: GET_ALL_USERS_REQUEST });
+export const getReelsAction = (userId) => async (dispatch) => {
+  dispatch({ type: GET_ALL_STORY_USER_REQUEST });
   try {
     setAuthHeader(); // Đảm bảo luôn có token trước khi gửi yêu cầu
-    const { data } = await api.get("/users");
+    const { data } = await api.get(`/reels/user/${userId}`);
     console.log("Danh sách story của các user trả về:", data); 
-    dispatch({ type: GET_ALL_USERS_SUCCESS, payload: data });
+    dispatch({ type: GET_ALL_STORY_USER_SUCCESS, payload: data.result });
   } catch (error) {
     console.error("❌ Get Users Error:", error.response?.data?.message || error.message);
-    dispatch({ type: GET_ALL_USERS_FAIL, payload: error.message });
+    dispatch({ type: GET_ALL_STORY_USER_FAIL, payload: error.message });
   }
 };
 
@@ -62,6 +64,8 @@ export const getUsersByIds = (userIds) => async (dispatch, getState) => {
           return { [id]: data.result || data };
       });
       const userResults = await Promise.all(userPromises);
+      //Dùng Promise.all để chờ tất cả kết quả trả về.
+      // Gộp kết quả thành object payload rồi dispatch lên Redux.
       const payload = Object.assign({}, ...userResults);
       console.log('Payload to dispatch:', payload);
       dispatch({ type: GET_USERS_SUCCESS, payload });

@@ -18,3 +18,8 @@ export const UPDATE_PROFILE_FAILURE = 'UPDATE_PROFILE_FAILURE';
 export const SEARCH_USER_REQUEST = 'SEARCH_USER_REQUEST';
 export const SEARCH_USER_SUCCESS = 'SEARCH_USER_SUCCESS';
 export const SEARCH_USER_FAILURE = 'SEARCH_USER_FAILURE';
+
+// Mục đích:
+// Giúp quản lý tên action nhất quán.
+// Tránh lỗi do viết sai tên action.
+// Dễ dàng mở rộng và bảo trì.

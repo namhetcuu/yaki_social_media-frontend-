@@ -21,6 +21,20 @@ if (typeof global === 'undefined') {
     window.global = window;
 }
 
+//Component mount lần đầu:
+// useEffect #1 (kết nối WebSocket) → chạy.
+// Sau khi userId có giá trị:
+// useEffect #3 (fetch chat list) → chạy.
+// Sau khi fetch chat list xong:
+// chatList thay đổi → useEffect #4 (fetch users) → chạy.
+// Khi user click vào 1 chat:
+// currentChat thay đổi → useEffect #5 (fetch thêm users nếu cần) → chạy.
+// currentChat thay đổi → useEffect #2 (đăng ký nhận tin nhắn WebSocket) → chạy.
+// Khi nhận tin nhắn mới từ WebSocket:
+// kiểm tra nếu thuộc currentChat → cập nhật messages.
+
+
+
 const Message = () => {
     const navigate = useNavigate();
     const [stompClient, setStompClient] = useState(null);
@@ -39,15 +53,19 @@ const Message = () => {
     const [loadingMessages, setLoadingMessages] = useState(false);
     const [isUsersLoaded, setIsUsersLoaded] = useState(false);
 
+    //useEffect đầu tiên – Kết nối WebSocket
     useEffect(() => {
-        const socket = new SockJS('http://localhost:8080/yaki/ws');
-        const client = Stomp.over(socket);
+        const socket = new SockJS('http://localhost:8080/yaki/ws');// Tạo kết nối SockJS
+        //STOMP giúp định tuyến tin nhắn theo topic: "/topic/messages".
+        const client = Stomp.over(socket);// Tạo client STOMP từ socket
+
         client.connect({}, (frame) => {
             console.log('Connected: ' + frame);
-            setStompClient(client);
+            setStompClient(client);// Lưu lại stompClient để dùng sau
         }, (error) => {
-            console.error('WebSocket connection error:', error);
+            console.error('WebSocket connection error:', error);// Xử lý lỗi nếu kết nối thất bại
         });
+        // Cleanup khi component bị hủy hoặc unmount
         return () => {
             if (client && client.connected) {
                 client.disconnect(() => console.log('Disconnected from WebSocket'));
@@ -55,23 +73,39 @@ const Message = () => {
         };
     }, []);
 
+    //useEffect thứ hai – Nhận tin nhắn mới từ WebSocket
+    // Khi có tin nhắn mới từ WebSocket, kiểm tra xem nó có thuộc về currentChat không
+    //Khi nào chạy:
+    // Khi stompClient hoặc currentChat thay đổi (ví dụ: user chọn chat khác).
+    // Cleanup: Hủy subscribe trước khi subscribe lại hoặc khi component unmount.
+    //Lắng nghe tin nhắn mới từ WebSocket (/topic/messages).
+    //Nếu tin nhắn đến đúng chat hiện tại đang mở ➔ thêm vào danh sách messages.
     useEffect(() => {
-        if (!stompClient || !currentChat) return;
+        if (!stompClient || !currentChat) return;// Nếu chưa có stompClient hoặc currentChat thì không làm gì
         const subscription = stompClient.subscribe('/topic/messages', (msg) => {
-            const newMessage = JSON.parse(msg.body);
+            const newMessage = JSON.parse(msg.body);// Parse nội dung tin nhắn
             console.log('New message received from /topic/messages:', newMessage);
+            // Nếu tin nhắn thuộc về chat hiện tại
             if (newMessage.chatId === currentChat.id) {
                 setMessages((prev) => {
+                    // Tránh thêm trùng tin nhắn
                     if (!prev.some((m) => m.id === newMessage.id)) {
-                        return [...prev, newMessage];
+                        return [...prev, newMessage];// Thêm vào danh sách tin nhắn
                     }
                     return prev;
                 });
             }
         });
+        // Cleanup: hủy subscription khi currentChat hoặc stompClient thay đổi
         return () => subscription.unsubscribe();
     }, [stompClient, currentChat]);
 
+    //useEffect 3 Fetch danh sách chat và users (Chạy khi biết userId)
+    //Nhiệm vụ:
+    // Load danh sách chat của user từ Redux action getAllChats.
+    // Extract các userId từ danh sách chat (loại bỏ userId hiện tại).
+    // Fetch thông tin chi tiết của các user đó bằng getUsersByIds.
+    // Set trạng thái isUsersLoaded để hiển thị UI.
     useEffect(() => {
         const fetchChatsAndUsers = async () => {
             if (!userId) return;
@@ -103,6 +137,7 @@ const Message = () => {
         fetchChatsAndUsers();
     }, [userId, dispatch]);
 
+    //useEffect 4 Fetch users từ danh sách chat (Fetch users for chats)
     useEffect(() => {
         const fetchUsers = async () => {
             if (!message.chats || message.chats.length === 0) {
@@ -127,7 +162,7 @@ const Message = () => {
         };
         fetchUsers();
     }, [message.chats, userId, dispatch]);
-
+//Load thêm user khi chọn vào một chat cụ thể(useEffect 5 – Fetch users for current chat)
     useEffect(() => {
         const fetchUsersForChat = async () => {
             if (!currentChat || !currentChat.userIds) return;
@@ -238,7 +273,7 @@ const Message = () => {
                 <Grid item xs={12} md={3} className="border-r h-full">
                     <div className="p-4 h-full flex flex-col">
                         <div className="flex items-center space-x-2 mb-6" onClick={handleHomeClick}>
-                            <WestIcon />
+                            <WestIcon className='cursor-pointer'/>
                             <h1 className="text-xl font-bold">Home</h1>
                         </div>
                         <SearchUser />

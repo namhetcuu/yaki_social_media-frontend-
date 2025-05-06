@@ -49,6 +49,8 @@ export const fetchUserProfile = () => async (dispatch) => {
 
 // 🔹 Login Action
 export const loginUserAction = (loginData, navigate) => async (dispatch) => {
+  //có tác dụng gửi một action đến Redux store để thông báo rằng một hành động đã xảy ra.
+  //dispatch là hàm do Redux cung cấp để gửi các action đến store.
   dispatch({ type: LOGIN_REQUEST });
   try {
     const { data } = await api.post("/auth/token", loginData);
@@ -59,8 +61,11 @@ export const loginUserAction = (loginData, navigate) => async (dispatch) => {
     storeToken(token);
     dispatch({ type: LOGIN_SUCCESS, payload: { token } });
     
+    // Gọi thêm các action khác để lấy thông tin user và danh sách bài viết
+    //Hai action này cũng là thunk, nên await để đảm bảo hoàn thành trước khi điều hướng.
     await dispatch(fetchUserProfile());
     await dispatch(getAllPostAction());
+
     navigate("/home");
   } catch (error) {
     console.error("❌ Login Error:", error.response?.data?.message || error.message);

@@ -101,7 +101,7 @@ const PostCard = ({ item }) => {
       <CardActions disableSpacing>
         <IconButton onClick={handleLikePost}>
           <motion.div animate={{ scale: isLiked ? 1.2 : 1 }}>
-            {isLiked ? <FavoriteIcon/>: <FavoriteBorderIcon/>}
+            {isLiked ? <FavoriteIcon />: <FavoriteBorderIcon/>}
           </motion.div>
         </IconButton>
         <Typography variant="body2">{item.likeCount}</Typography>

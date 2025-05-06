@@ -1,6 +1,5 @@
 import { Avatar, Card, IconButton } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import StoryCircle from "./StoryCircle";
 import ImageIcon from "@mui/icons-material/Image";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import ArticleIcon from "@mui/icons-material/Article";
@@ -9,7 +8,6 @@ import CreatePostModal from "../CreatePost/CreatePostModal";
 import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllPostAction } from "../../Redux/Post/post.action";
-import { getStoriesAction } from "../../Redux/Users/user.action";
 
 //const stories = [1, 2, 3, 4, 5]; // Danh sách giả định
 

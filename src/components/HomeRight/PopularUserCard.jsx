@@ -2,13 +2,16 @@ import { Avatar, Button, CardHeader, IconButton } from '@mui/material'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { red } from '@mui/material/colors';
 
-const PopularUserCard = () => {
+const PopularUserCard = ({user}) => {
   return (
     <div>
       <CardHeader
         avatar={
-          <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-            R
+          <Avatar 
+          sx={{ bgcolor: red[500] }} 
+          src={user.profilePicture}
+          aria-label="recipe">
+            {user.firstName?.charAt(0) || user.username?.charAt(0) || 'U'}
           </Avatar>
         }
         action={
@@ -16,8 +19,8 @@ const PopularUserCard = () => {
             Follow
           </Button>
         }
-        title="Truong Xuan Nhon"
-        subheader="@truongnhon"
+        title={`${user.firstName} ${user.lastName}`}
+        subheader={`@${user.username}`}
       />
     </div>
   )
