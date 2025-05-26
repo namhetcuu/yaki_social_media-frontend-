@@ -15,6 +15,7 @@ import { useEffect } from 'react';
 import { checkAuthStatus } from './Redux/Auth/auth.action';
 import ContextProvider from './pages/ChatWithAI/Context';
 import Notification from './pages/Notification/notification';
+import Setting from './pages/Setting/Setting';
 
 function HomeLayout() {
   return <HomePage><Outlet /></HomePage>;
@@ -37,23 +38,12 @@ function App() {
   const { user, token } = useSelector(state => state.auth);
 
   
-  //🔄 useEffect 1: Gọi kiểm tra trạng thái đăng nhập khi mở app
+  //🔄 useEffect 1: này chạy đúng 1 lần duy nhất khi component App được render lần đầu.
   useEffect(() => {
     dispatch(checkAuthStatus()); // Gọi API kiểm tra trạng thái auth khi mở app
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   const jwt = localStorage.getItem("jwt");
-
-  //   if (!jwt && location.pathname === "/") {
-  //     navigate("/login"); // Chuyển hướng đến /login nếu không có JWT và đang ở "/"
-  //   } else if (!jwt) {
-  //     navigate("/login")
-  //   } else if (!user) {
-  //     dispatch(checkAuthStatus()); // Nếu có JWT nhưng chưa có user, gọi lại checkAuthStatus
-  //   }
-  // }, [user, navigate, dispatch, location.pathname]); // Thêm location.pathname vào dependencies
-
+  // useEffect 2: Khi bạn reload (F5) Trình duyệt tải lại toàn bộ app.Redux store reset về mặc định → user bị xóa.
   useEffect(() => {
     const jwt = localStorage.getItem("jwt");
   
@@ -64,16 +54,10 @@ function App() {
     } else {
       if (!user) {
         dispatch(checkAuthStatus());
+        
       }
     }
   }, [user, dispatch, navigate, location.pathname]);
-  
-
-  // useEffect(() => {
-  //   if (user && location.pathname === "/") {
-  //     navigate("/home"); // ✅ Chỉ điều hướng nếu đang ở `/`
-  //   }
-  // }, [user, location.pathname, navigate]);
 
   return (
     <div className='w-[100vw] h-[100vh] '>
@@ -108,6 +92,7 @@ function App() {
           <Route path='create-reels' element={<CreateReelsForm />} />
           <Route path='notifications' element={<Notification />} />
           <Route path='profile/:id' element={<Profile />} />
+          <Route path='settings' element={<Setting />} />
         </Route>
       </Routes>
     </div>

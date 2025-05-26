@@ -6,10 +6,12 @@ import {
   UPDATE_PROFILE_REQUEST, UPDATE_PROFILE_SUCCESS, UPDATE_PROFILE_FAILURE,
   SEARCH_USER_SUCCESS,
   SEARCH_USER_REQUEST,
-  SEARCH_USER_FAILURE
+  SEARCH_USER_FAILURE,
+  
 } from "./auth.actionType";
 import { API_BASE_URL } from "../../config/api";
 import { getAllPostAction } from "../Post/post.action";
+import  isTokenExpired  from '../../utils/tokenUtils';
 
 // 🔹 Cấu hình Axios
 const api = axios.create({
@@ -23,6 +25,12 @@ const storeToken = (token) => {
     localStorage.setItem("jwt", token);
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   }
+};
+
+// 📌 Xóa token khỏi localStorage
+const removeToken = () => {
+  localStorage.removeItem("jwt");
+  delete api.defaults.headers.common["Authorization"];
 };
 
 // 📌 Lấy token từ localStorage
@@ -74,7 +82,7 @@ export const loginUserAction = (loginData, navigate) => async (dispatch) => {
 };
 
 // 🔹 Register Action
-export const registerUserAction = (registerData, navigate) => async (dispatch) => {
+export const registerUserAction = (registerData, navigate, onSuccess) => async (dispatch) => {
   dispatch({ type: REGISTER_REQUEST });
   try {
     const { data } = await api.post("/auth/signup", registerData);
@@ -84,6 +92,8 @@ export const registerUserAction = (registerData, navigate) => async (dispatch) =
 
     storeToken(token);
     dispatch({ type: REGISTER_SUCCESS, payload: { token } });
+
+    if (onSuccess) onSuccess(); // 👈 Gọi callback nếu có
     
     await dispatch(fetchUserProfile());
     navigate("/home");
@@ -110,10 +120,32 @@ export const updateProfileAction = (reqData) => async (dispatch) => {
 export const checkAuthStatus = () => async (dispatch) => {
   const token = getToken();
   if (token) {
+    if(isTokenExpired(token)) {
+      console.log("token expired");
+      
+      removeToken();
+      delete axios.defaults.headers.common["Authorization"];
+      dispatch(logoutUserAction());
+      return;
+    }
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    await dispatch(fetchUserProfile()); // Load lại user khi reload
-    await dispatch(getAllPostAction()); // Load lại danh sách bài viết khi reload
+    try {
+      await dispatch(fetchUserProfile()); // Load lại user khi reload
+      await dispatch(getAllPostAction()); // Load lại danh sách bài viết khi reload
+    } catch (error) {
+      console.log("❌ Check Auth Error:", error.response?.data?.message || error.message);
+      
+    }
+    
   }
+};
+
+// 🔹 Logout Action
+export const logoutUserAction = () => (dispatch) => {
+  removeToken();
+  dispatch({ type: LOGIN_FAILURE, payload: "Logged out successfully" });
+  dispatch({ type: GET_PROFILE_SUCCESS, payload: null }); // Reset user profile
+  dispatch({ type: SEARCH_USER_SUCCESS, payload: [] }); // Reset search results
 };
 
 export const searchUser = (query) => async (dispatch) => {
@@ -129,3 +161,5 @@ export const searchUser = (query) => async (dispatch) => {
     dispatch({ type: SEARCH_USER_FAILURE, payload: error.message });
   }
 };
+
+

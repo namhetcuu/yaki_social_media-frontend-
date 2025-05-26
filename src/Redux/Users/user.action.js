@@ -3,7 +3,9 @@ import { API_BASE_URL } from "../../config/api";
 import {
   GET_USERS_REQUEST,GET_USERS_SUCCESS,GET_USERS_FAILURE,
    GET_ALL_STORY_USER_REQUEST, GET_ALL_STORY_USER_SUCCESS,
-    GET_ALL_STORY_USER_FAIL
+    GET_ALL_STORY_USER_FAIL,
+    GET_LIST_USER_WITH_STATUS_REQUEST,
+  GET_LIST_USER_WITH_STATUS_SUCCESS,
 } from "./user.actionType";
 
 // 🔹 Cấu hình Axios
@@ -77,3 +79,57 @@ export const getUsersByIds = (userIds) => async (dispatch, getState) => {
   }
 };
 
+export const getUserWithFollowStatus = (userId) => async (dispatch) => {
+  dispatch({type: GET_LIST_USER_WITH_STATUS_REQUEST});
+  try {
+    const token = getToken();
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    const {data} = await api.get(`/users/users-with-follow-status/${userId}`,config);
+    console.log("Api response: ", data);
+    
+    if(!Array.isArray(data.result)){
+      console.error("Data Response is not Array");
+      throw new Error("Invalid API response format");
+      
+    }
+    dispatch({type: GET_LIST_USER_WITH_STATUS_SUCCESS, payload: data.result})
+
+  } catch (error) {
+    console.log(" Error:", error.response?.data?.message || error.message);
+    
+  }
+}
+
+export const followUser = (userId1,userId2) => async (dispatch) => {
+  try {
+    const token = getToken();
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    await api.put(`/users/follow/${userId1}/${userId2}`,{},config);
+    dispatch(getUserWithFollowStatus(userId1))
+  } catch (error) {
+     console.error("❌ Follow Error:", error.response?.data?.message || error.message);
+  }
+}
+
+export const unfollowUser = (userId1,userId2) => async (dispatch) => {
+  try {
+    const token = getToken();
+    const config = {
+        headers: {
+        Authorization: `Bearer ${token}`,
+        },
+    };
+    await api.delete(`/users/unfollow/${userId1}/${userId2}`, config);
+    dispatch(getUserWithFollowStatus(userId1));
+  } catch (error) {
+     console.error("❌ UnFollow Error:", error.response?.data?.message || error.message);
+  }
+}

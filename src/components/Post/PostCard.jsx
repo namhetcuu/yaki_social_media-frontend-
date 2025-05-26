@@ -12,6 +12,8 @@ import {
   Typography,
   Divider,
   CircularProgress,
+  Button,
+  Backdrop,
 } from "@mui/material";
 import { red } from "@mui/material/colors";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -23,33 +25,30 @@ import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { createCommentAction, likePostAction } from "../../Redux/Post/post.action";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { motion } from "framer-motion"; // Import animation library
+import { motion } from "framer-motion";
+import { useEffect } from "react";
 
 const PostCard = ({ item }) => {
   const dispatch = useDispatch();
-  const {post} = useSelector(store =>store);
-
-
+  //const {post} = useSelector(store =>store);
+  
+  
   const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState("");
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [comments, setComments] = useState([]); // Danh sách bình luận
-  const [loading, setLoading] = useState(false); // Trạng thái loading khi gửi comment
+  const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleShowComment = () => setShowComments(!showComments);
-  const handleLikePost = () => 
-    {
-        setIsLiked(prev => !prev);
-        console.log("isLiked: ",isLiked);
-        
-        console.log("ID bài viết:", item.id);
-        console.log("ID tác giả:", item.authorId);
-        dispatch(likePostAction(item.id,item.authorId))
-    }
+  const handleLikePost = () => {
+    setIsLiked(prev => !prev);
+    dispatch(likePostAction(item.id,item.authorId))
+  }
   const handleBookmarkPost = () => setIsBookmarked(!isBookmarked);
 
-  // Gửi comment
+  
+
   const handleCreateComment = async () => {
     if (comment.trim() === "") return;
 
@@ -62,65 +61,95 @@ const PostCard = ({ item }) => {
 
     dispatch(createCommentAction(reqData));
 
-    // Giả lập delay để hiển thị hiệu ứng loading
     setTimeout(() => {
-      setComments([...comments, { content: comment }]); // Thêm bình luận vào danh sách
+      setComments([...comments, { content: comment }]);
       setComment("");
       setLoading(false);
     }, 500);
   };
 
   return (
-    <Card>
+    <Card sx={{ maxWidth: 700, marginBottom: '2rem', borderRadius: 2 }}>
       <CardHeader
         avatar={<Avatar sx={{ bgcolor: red[500] }}>{item.authorUsername.charAt(0).toUpperCase()}</Avatar>}
+        title={
+          <div>
+            <Typography variant="subtitle1" fontWeight="bold">{item.authorUsername}</Typography>
+            <Typography variant="caption" color="text.secondary">October 11 - 🌟</Typography>
+          </div>
+        }
         action={
           <IconButton>
             <MoreVertIcon />
           </IconButton>
         }
-        title={item.authorUsername}
-        subheader="6 phút trước"
       />
 
-      <CardContent>
-        <Typography variant="body2" color="text.secondary">
-          {item.caption}
+      <CardContent sx={{ paddingBottom: 0 }}>
+        <Typography variant="body2" color="text.secondary" paragraph>
+          {item.caption || "No caption provided."}
+        </Typography>
+        <Typography variant="body2" color="primary" sx={{ marginBottom: 2 }}>
+          #hashtag
         </Typography>
       </CardContent>
 
-      {/* <CardMedia
-        component="img"
-        height="194"
-        image={item.imageUrl}
-        alt="Post Image"
-        style={{ maxWidth: "100%", height: "auto", minWidth: "436.139px" }}
-      /> */}
       <img src={item.imageUrl} alt="" className="w-full max-h-[30rem] object-cover object-top"/>
 
-      <CardActions disableSpacing>
-        <IconButton onClick={handleLikePost}>
-          <motion.div animate={{ scale: isLiked ? 1.2 : 1 }}>
-            {isLiked ? <FavoriteIcon />: <FavoriteBorderIcon/>}
+      <CardContent sx={{ paddingTop: 1, paddingBottom: 1 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Typography variant="body2" fontWeight="bold">{item.likeCount}</Typography>
+          <Typography variant="body2" color="text.secondary">
+            {item.comments?.length || 0} Comments • 5 Shares
+          </Typography>
+        </div>
+      </CardContent>
+
+      <Divider />
+
+      <CardActions disableSpacing sx={{ justifyContent: 'space-around' }}>
+        <IconButton onClick={handleLikePost} sx={{ flexDirection: 'column',color: isLiked ? red[500] : 'inherit' }}>
+          <motion.div 
+            animate={{ 
+              scale: isLiked ? [1, 1.2, 1] : 1,
+              color: isLiked ? red[500] : 'inherit'
+            }}
+            transition={{ duration: 0.3 }}
+          >
+            {isLiked ? (
+              <FavoriteIcon />
+            ) : (
+              <FavoriteBorderIcon />
+            )}
           </motion.div>
+          <Typography variant="caption" sx={{ color: isLiked ? red[500] : 'inherit' }}>
+            Like
+          </Typography>
         </IconButton>
-        <Typography variant="body2">{item.likeCount}</Typography>
-        <IconButton onClick={handleShowComment}>
+        
+        <IconButton onClick={handleShowComment} sx={{ flexDirection: 'column' }}>
           <CommentIcon />
+          <Typography variant="caption">Comment</Typography>
         </IconButton>
-        <IconButton>
+        
+        <IconButton sx={{ flexDirection: 'column' }}>
           <ShareIcon />
-        </IconButton>
-        <IconButton onClick={handleBookmarkPost} style={{ marginLeft: "auto" }}>
-          {isBookmarked ? <BookmarkIcon color="primary" /> : <BookmarkBorderIcon />}
+          <Typography variant="caption">Share</Typography>
         </IconButton>
       </CardActions>
 
+      <Divider />
+
       {showComments && (
         <section>
-          {/* Ô nhập bình luận */}
-          <div className="flex items-center space-x-3 mx-3 my-5">
-            <Avatar />
+          <CardContent sx={{ paddingTop: 1 }}>
+            <Typography variant="subtitle2" color="text.secondary">
+              Most relevant ▼
+            </Typography>
+          </CardContent>
+          
+          <div className="flex items-center space-x-3 mx-3 my-2">
+            <Avatar sx={{ width: 32, height: 32 }} />
             <input
               value={comment}
               type="text"
@@ -131,20 +160,25 @@ const PostCard = ({ item }) => {
                 }
               }}
               className="w-full outline-none bg-transparent border border-gray-300 rounded-full px-5 py-2"
-              placeholder="Viết bình luận..."
+              placeholder="Write a comment..."
             />
-            <button
-              onClick={handleCreateComment}
-              disabled={loading}
-              className="px-4 py-1 text-white bg-blue-500 rounded-full hover:bg-blue-600 transition duration-200"
-            >
-              {loading ? <CircularProgress size={16} color="inherit" /> : "Gửi"}
-            </button>
           </div>
+          
+          <Typography 
+            variant="body2" 
+            color="text.secondary" 
+            sx={{ 
+              textAlign: 'center', 
+              padding: '8px',
+              cursor: 'pointer'
+            }}
+            onClick={() => setShowComments(true)}
+          >
+            View comments
+          </Typography>
 
           <Divider />
 
-          {/* Danh sách bình luận */}
           <div className="mx-3 space-y-2 my-5 text-xs">
             {item.comments?.map((cmt, index) => (
               <motion.div

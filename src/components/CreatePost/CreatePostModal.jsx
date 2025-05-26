@@ -19,6 +19,7 @@ const CreatePostModal = ({ handleClose, open }) => {
     const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch();
     const userId = useSelector(state => state.auth.user?.id);
+    const auth = useSelector(state => state.auth);
     console.log("Redux userId:", userId);
 
     const formik = useFormik({
@@ -81,10 +82,10 @@ const CreatePostModal = ({ handleClose, open }) => {
                         </IconButton>
                         <form onSubmit={formik.handleSubmit}>
                             <div className='flex space-x-4 items-center'>
-                                <Avatar />
+                                <Avatar src={auth.user?.profilePicture}/>
                                 <div>
-                                    <Typography variant='h6'>Nam Nam</Typography>
-                                    <Typography variant='body2' color='textSecondary'>@Yakinasu</Typography>
+                                    <Typography variant='h6'>{auth.user?.username}</Typography>
+                                    <Typography variant='body2' color='textSecondary'>@{auth.user?.username}</Typography>
                                 </div>
                             </div>
                             <textarea

@@ -45,6 +45,9 @@ const Sidebar = () => {
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
   
   const handleClose = () => {
     localStorage.removeItem("jwt"); // Xóa token
@@ -80,7 +83,7 @@ const Sidebar = () => {
         <div className='pl-5 flex items-center justify-between pt-5'>
           <div className='flex items-center space-x-3'>
             <Avatar 
-              src={auth.user?.avatar || "https://via.placeholder.com/150"} 
+              src={auth.user?.profilePicture || "https://via.placeholder.com/150"} 
               alt="User Avatar"
             />
             <div>
@@ -103,10 +106,10 @@ const Sidebar = () => {
               id="basic-menu"
               anchorEl={anchorEl}
               open={open}
-              onClose={handleClose}
               MenuListProps={{ 'aria-labelledby': 'basic-button' }}
+              onClose={handleCloseMenu}
             >
-              <MenuItem onClick={() => { handleClose(); navigate(`/home/profile/${userId}`); }}>Profile</MenuItem>
+              <MenuItem onClick={() => navigate('/home/settings')}>Setting</MenuItem>
               <MenuItem onClick={handleClose}>Logout</MenuItem>
             </Menu>
           </div>

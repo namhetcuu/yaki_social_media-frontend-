@@ -21,7 +21,8 @@ const initialState = {
     error: null,
     loading: false,
     user: null,
-    searchUser: []
+    searchUser: [],
+    
 }
 export const authReducer = (state = initialState, action) => {
     switch (action.type) {
@@ -54,6 +55,8 @@ export const authReducer = (state = initialState, action) => {
         case SEARCH_USER_SUCCESS:{
             return {...state,searchUser:action.payload.result,loading:false,error:null}
         }
+        
+            
 
         case LOGIN_SUCCESS:
             return {
@@ -74,6 +77,7 @@ export const authReducer = (state = initialState, action) => {
                 loading: false,
                 error: action.payload
             }
+        
         default:
             return state;
     }

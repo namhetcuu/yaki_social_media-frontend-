@@ -19,7 +19,7 @@ const ChatMessage = ({ messages, currentUserId }) => {
     if (userIds.length > 0) {
       dispatch(getUsersByIds(userIds));
     }
-  }, [dispatch, userIds]);
+  },[]);
 
   const handleImageClick = (imageUrl) => {
     setSelectedImage(imageUrl);

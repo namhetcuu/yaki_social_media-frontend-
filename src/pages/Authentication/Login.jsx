@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, TextField, IconButton, InputAdornment } from '@mui/material';
+import { Button, TextField, IconButton, InputAdornment, Snackbar, Alert } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
@@ -19,8 +19,20 @@ const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
+  // 👇 Snackbar state
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const handleCloseSnackbar = (event,reason) => {
+    if(reason === "clickaway"){
+      return;
+    }
+    setOpenSnackbar(false);
+  }
+
   const handleSubmit = (values) => {
-    dispatch(loginUserAction(values, navigate));
+    dispatch(loginUserAction(values, navigate, () => {
+      setOpenSnackbar(true); // 👈 Mở snackbar khi login thành công
+    }));
   };
 
   const toggleShowPassword = () => {
@@ -82,6 +94,24 @@ const Login = () => {
           </Form>
         )}
       </Formik>
+
+      {/* Snackbar success */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarMessage.includes('success') ? 'success' : 'error'}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+
 
       <div className="flex gap-2 items-center justify-center pt-5 text-sm">
         <p>Don't have an account?</p>
