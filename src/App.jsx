@@ -16,6 +16,8 @@ import { checkAuthStatus } from './Redux/Auth/auth.action';
 import ContextProvider from './pages/ChatWithAI/Context';
 import Notification from './pages/Notification/notification';
 import Setting from './pages/Setting/Setting';
+import ForgotPassword from './pages/Authentication/ForgotPassword';
+import Communities from './pages/Communites/Communites';
 
 function HomeLayout() {
   return <HomePage><Outlet /></HomePage>;
@@ -35,7 +37,7 @@ function App() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation(); // Lấy thông tin đường dẫn hiện tại
-  const { user, token } = useSelector(state => state.auth);
+  const { user } = useSelector(state => state.auth);
 
   
   //🔄 useEffect 1: này chạy đúng 1 lần duy nhất khi component App được render lần đầu.
@@ -48,7 +50,7 @@ function App() {
     const jwt = localStorage.getItem("jwt");
   
     if (!jwt) {
-      if (location.pathname !== '/login' && location.pathname !== '/register') {
+      if (location.pathname !== '/login' && location.pathname !== '/register' && location.pathname !== '/forgot-password') {
         navigate('/login');
       }
     } else {
@@ -74,6 +76,7 @@ function App() {
           <Route index element={<Login />} /> 
           <Route path='login' element={<Login />} />
           <Route path='register' element={<Register />} />
+          <Route path='forgot-password' element={<ForgotPassword />} />
         </Route>
         
         <Route path='/message' element={<Message />} />
@@ -92,6 +95,7 @@ function App() {
           <Route path='create-reels' element={<CreateReelsForm />} />
           <Route path='notifications' element={<Notification />} />
           <Route path='profile/:id' element={<Profile />} />
+          <Route path='communities' element={<Communities />} />
           <Route path='settings' element={<Setting />} />
         </Route>
       </Routes>

@@ -20,23 +20,32 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import CommentIcon from "@mui/icons-material/Comment";
+import MoodIcon from '@mui/icons-material/Mood';
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { createCommentAction, likePostAction } from "../../Redux/Post/post.action";
+import { createCommentAction, getPostByIdAction, likePostAction, savedPost } from "../../Redux/Post/post.action";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 
 const PostCard = ({ item }) => {
+  const { user } = useSelector((state) => state.auth);
+  const currentUserId = user?.id;
+
   const dispatch = useDispatch();
   //const {post} = useSelector(store =>store);
   
   
   const [showComments, setShowComments] = useState(false);
   const [comment, setComment] = useState("");
-  const [isLiked, setIsLiked] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  const [isBookmarked, setIsBookmarked] = useState(true);
+
+  //const [isLiked, setIsLiked] = useState(false);
+
+  const [isLiked, setIsLiked] = useState(item.likedUsers?.includes(currentUserId));
+
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -45,9 +54,15 @@ const PostCard = ({ item }) => {
     setIsLiked(prev => !prev);
     dispatch(likePostAction(item.id,item.authorId))
   }
-  const handleBookmarkPost = () => setIsBookmarked(!isBookmarked);
+  const handleBookmarkPost = () => {
+    const newState = !isBookmarked;
+    setIsBookmarked(newState);
+  }
 
-  
+
+  useEffect(() => {
+  setIsLiked(item.likedUsers?.includes(currentUserId));
+}, [item.likedUsers, currentUserId]);
 
   const handleCreateComment = async () => {
     if (comment.trim() === "") return;
@@ -60,6 +75,7 @@ const PostCard = ({ item }) => {
     };
 
     dispatch(createCommentAction(reqData));
+    //dispatch(getPostByIdAction(item.id));
 
     setTimeout(() => {
       setComments([...comments, { content: comment }]);
@@ -71,7 +87,8 @@ const PostCard = ({ item }) => {
   return (
     <Card sx={{ maxWidth: 700, marginBottom: '2rem', borderRadius: 2 }}>
       <CardHeader
-        avatar={<Avatar sx={{ bgcolor: red[500] }}>{item.authorUsername.charAt(0).toUpperCase()}</Avatar>}
+        avatar={<Avatar src={item.avatar || "https://images.pexels.com/photos/20766142/pexels-photo-20766142/free-photo-of-hoa-ng-i-ban-chan-dung.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"}
+        sx={{ bgcolor: red[500] }}>{item.authorUsername.charAt(0).toUpperCase()}</Avatar>}
         title={
           <div>
             <Typography variant="subtitle1" fontWeight="bold">{item.authorUsername}</Typography>
@@ -79,8 +96,11 @@ const PostCard = ({ item }) => {
           </div>
         }
         action={
-          <IconButton>
-            <MoreVertIcon />
+          <IconButton onClick={handleBookmarkPost}>
+            {
+              isBookmarked ? <BookmarkBorderIcon /> : <BookmarkIcon/>
+            }
+            
           </IconButton>
         }
       />
@@ -90,7 +110,7 @@ const PostCard = ({ item }) => {
           {item.caption || "No caption provided."}
         </Typography>
         <Typography variant="body2" color="primary" sx={{ marginBottom: 2 }}>
-          #hashtag
+          #newday
         </Typography>
       </CardContent>
 
@@ -98,7 +118,12 @@ const PostCard = ({ item }) => {
 
       <CardContent sx={{ paddingTop: 1, paddingBottom: 1 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="body2" fontWeight="bold">{item.likeCount}</Typography>
+          <Typography variant="body2" >
+            <FavoriteIcon sx={{color: 'red'}}/>
+            <ThumbUpIcon sx={{color: 'blue'}}/>
+            <MoodIcon sx={{color: 'yellow'}}/>
+            {item.likeCount} and 4 others
+            </Typography>
           <Typography variant="body2" color="text.secondary">
             {item.comments?.length || 0} Comments • 5 Shares
           </Typography>
@@ -110,6 +135,7 @@ const PostCard = ({ item }) => {
       <CardActions disableSpacing sx={{ justifyContent: 'space-around' }}>
         <IconButton onClick={handleLikePost} sx={{ flexDirection: 'column',color: isLiked ? red[500] : 'inherit' }}>
           <motion.div 
+          key={isLiked ? "liked":"unliked"}
             animate={{ 
               scale: isLiked ? [1, 1.2, 1] : 1,
               color: isLiked ? red[500] : 'inherit'

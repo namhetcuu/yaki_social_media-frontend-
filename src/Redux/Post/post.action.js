@@ -6,7 +6,10 @@ import { CREATE_POST_REQUEST, CREATE_POST_SUCCESS,
      GET_USERS_POST_FAILURE, LIKE_POST_REQUEST, 
      LIKE_POST_SUCCESS, LIKE_POST_FAILURE, 
      CREATE_COMMENT_REQUEST, CREATE_COMMENT_SUCCESS,
-      CREATE_COMMENT_FAILURE } from "./post.actionType";
+      CREATE_COMMENT_FAILURE,GET_POST_REQUEST,GET_POST_SUCCESS,GET_POST_FAILURE, 
+      SAVE_POST_SUCCESS,
+      SAVE_POST_REQUEST,
+      SAVE_POST_FAILURE} from "./post.actionType";
 
 export const createPostAction = (userId, { caption, image }) => async (dispatch, getState) => {
     dispatch({ type: CREATE_POST_REQUEST });
@@ -141,9 +144,55 @@ export const createCommentAction = (commentData) => async (dispatch) => {
         
         dispatch({ type: CREATE_COMMENT_SUCCESS, payload: data });
         console.log("create comment: ", data);
+        await dispatch(getAllPostAction())
             
         } catch (error) {
             console.error("Lỗi khi tạo bài viết:", error);
             dispatch({type: CREATE_COMMENT_FAILURE, payload: error})
         }
+}
+
+export const getPostByIdAction = (id) => async (dispatch) => {
+    dispatch({type: GET_ALL_POST_REQUEST});
+    try {
+        const token = localStorage.getItem("jwt");
+        console.log("📌 Token gửi API:", token); // Kiểm tra token
+
+        const {data} = await api.get(`/posts/${id}`,{
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        dispatch({type: GET_ALL_POST_SUCCESS, payload: data});
+        console.log("get post by id: ",data);
+        
+    } catch (error) {
+        console.error("Lỗi khi get bài viết:", error);
+            dispatch({type: GET_ALL_POST_FAILURE, payload: error})
+    }
+}
+
+export const savedPost = (idPost,idUser,isBookmarked) => async (dispatch) => {
+    dispatch({type: SAVE_POST_REQUEST})
+    try {
+        const token = localStorage.getItem("jwt");
+        console.log("📌 Token gửi API:", token); // Kiểm tra token
+        if(isBookmarked){
+            
+            const {data} = await api.delete(`/posts/unsave/${idPost}/users/${idUser}`,{
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            dispatch({type: SAVE_POST_SUCCESS, payload: data});
+            
+        }else{
+
+            const {data} = await api.put(`/posts/save/${idPost}/users/${idUser}`,{},{
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            dispatch({type: SAVE_POST_SUCCESS, payload: data});
+        }
+        await dispatch(getAllPostAction())
+        
+    } catch (error) {
+        console.error("Lỗi khi save bài viết:", error);
+        dispatch({type: SAVE_POST_FAILURE, payload: error})
+    }
 }

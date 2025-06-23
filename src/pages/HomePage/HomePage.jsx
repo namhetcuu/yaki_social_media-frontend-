@@ -9,7 +9,7 @@ import InfoIcon from "@mui/icons-material/Info";
 
 const HomePage = () => {
   const location = useLocation();
-  const { auth } = useSelector((store) => store);
+  //const { auth } = useSelector((store) => store);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const toggleDrawer = () => setDrawerOpen(!drawerOpen);
@@ -63,8 +63,8 @@ const HomePage = () => {
           xs={0}
           sm={0}
           md={0}
-          lg={3}
-          xl={2}
+          lg={3}//≥ 1024px
+          xl={2}//≥ 1280px
           className="hidden lg:block"
         >
           <div className="sticky top-0 h-screen overflow-y-auto">
@@ -75,9 +75,9 @@ const HomePage = () => {
         {/* Main Content */}
         <Grid
           item
-          xs={12}
-          sm={12}
-          md={12}
+          xs={12}// < 600px
+          sm={12}//600px ≤ width < 768px
+          md={6}//768px ≤ width < 1024px
           lg={showHomeRight ? 6 : 9}
           xl={showHomeRight ? 7 : 10}
           className="px-2 sm:px-4 md:px-6 flex justify-center"
@@ -91,7 +91,7 @@ const HomePage = () => {
             item
             xs={0}
             sm={0}
-            md={0}
+            md={3}
             lg={3}
             xl={3}
             className="hidden lg:block"

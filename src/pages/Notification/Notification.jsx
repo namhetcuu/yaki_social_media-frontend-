@@ -1,265 +1,240 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Box,
+  Badge,
   List,
   ListItem,
   ListItemAvatar,
   Avatar,
   ListItemText,
   Typography,
-  Badge,
-  IconButton,
   Divider,
   Button,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Chip,
+  IconButton
 } from '@mui/material';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import CloseIcon from '@mui/icons-material/Close';
-import { green, red, orange } from '@mui/material/colors';
-
-// Dữ liệu thông báo mẫu (giữ nguyên)
-const sampleNotifications = [
-  {
-    id: 1,
-    title: "Bạn có tin nhắn mới",
-    message: "Nguyễn Văn A đã gửi bạn một tin nhắn",
-    time: "10 phút trước",
-    read: false,
-    type: "message",
-    avatar: "https://i.pravatar.cc/150?img=1"
-  },
-  {
-    id: 2,
-    title: "Đơn hàng đã xác nhận",
-    message: "Đơn hàng #12345 của bạn đã được xác nhận",
-    time: "2 giờ trước",
-    read: false,
-    type: "order",
-    avatar: "https://i.pravatar.cc/150?img=2"
-  },
-  {
-    id: 3,
-    title: "Hệ thống bảo trì",
-    message: "Hệ thống sẽ bảo trì từ 2h-4h ngày mai",
-    time: "1 ngày trước",
-    read: true,
-    type: "system",
-    avatar: "https://i.pravatar.cc/150?img=3"
-  }
-];
+import {
+  Close as CloseIcon,
+  MarkEmailRead as MarkEmailReadIcon,
+  LocalShipping as LocalShippingIcon,
+  Warning as WarningIcon,
+  CheckCircle as CheckCircleIcon,
+  Notifications as NotificationsIcon
+} from '@mui/icons-material';
+import { green, red, orange, blue } from '@mui/material/colors';
 
 const Notification = () => {
-  const [notifications, setNotifications] = useState(sampleNotifications);
-  const [open, setOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [selectedNotification, setSelectedNotification] = useState(null); // Thông báo được chọn để xem chi tiết
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      title: "Bạn có tin nhắn mới",
+      message: "Khánh lê công đã gửi bạn một tin nhắn",
+      time: "10 phút trước",
+      read: false,
+      type: "message",
+      avatar: "https://i.pravatar.cc/150?img=1"
+    },
+    {
+      id: 2,
+      title: "Bạn có 1 tin nhắn mới",
+      message: "Liễu Hồ Thị đã gửi bạn một tin nhắn",
+      time: "2 giờ trước",
+      read: false,
+      type: "order",
+      avatar: "https://i.pravatar.cc/150?img=2"
+    },
+    {
+      id: 3,
+      title: "Hệ thống bảo trì",
+      message: "Hệ thống sẽ bảo trì từ 2h-4h ngày mai",
+      time: "1 ngày trước",
+      read: true,
+      type: "system",
+      avatar: "https://i.pravatar.cc/150?img=3"
+    },
+    {
+      id: 4,
+      title: "Đăng tin reels thành công",
+      message: "Bạn đã đăng tin reels thành công",
+      time: "3 ngày trước",
+      read: true,
+      type: "payment",
+      avatar: "https://i.pravatar.cc/150?img=4"
+    }
+  ]);
 
-  // Tính số thông báo chưa đọc
-  useEffect(() => {
-    const count = notifications.filter(n => !n.read).length;
-    setUnreadCount(count);
-  }, [notifications]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState(null);
 
-  // Đánh dấu đã đọc
-  const markAsRead = (id) => {
-    setNotifications(notifications.map(n => 
-      n.id === id ? { ...n, read: true } : n
-    ));
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const handleNotificationClick = (notification) => {
+    // Đánh dấu là đã đọc
+    if (!notification.read) {
+      setNotifications(notifications.map(n => 
+        n.id === notification.id ? {...n, read: true} : n
+      ));
+    }
+    setSelectedNotification(notification);
+    setOpenDialog(true);
   };
 
-  // Đánh dấu tất cả là đã đọc
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
+  const handleMarkAllAsRead = () => {
+    setNotifications(notifications.map(n => ({...n, read: true})));
   };
 
-  // Xóa một thông báo
-  const deleteNotification = (id) => {
-    setNotifications(notifications.filter(n => n.id !== id));
-  };
-
-  // Xóa tất cả thông báo
-  const clearAllNotifications = () => {
+  const handleDeleteAll = () => {
     setNotifications([]);
   };
 
-  // Lấy màu theo loại thông báo
-  const getTypeColor = (type) => {
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const getNotificationIcon = (type) => {
     switch(type) {
-      case 'message': return green[500];
-      case 'order': return orange[500];
-      case 'system': return red[500];
-      default: return '#1976d2';
+      case 'message':
+        return <MarkEmailReadIcon sx={{ color: blue[500] }} />;
+      case 'order':
+        return <LocalShippingIcon sx={{ color: green[500] }} />;
+      case 'system':
+        return <WarningIcon sx={{ color: orange[500] }} />;
+      case 'payment':
+        return <CheckCircleIcon sx={{ color: green[500] }} />;
+      default:
+        return <NotificationsIcon />;
     }
-  };
-
-  // Mở modal xem chi tiết thông báo
-  const handleOpenDetail = (notification) => {
-    setSelectedNotification(notification);
-    if (!notification.read) {
-      markAsRead(notification.id);
-    }
-    setOpen(true);
-  };
-
-  // Đóng modal
-  const handleCloseDetail = () => {
-    setOpen(false);
-    setSelectedNotification(null);
   };
 
   return (
-    <Box sx={{ position: 'relative' }}>
-      {/* Nút thông báo */}
-      <IconButton 
-        size="large"
-        color="inherit"
-        onClick={() => setOpen(prev => !prev)}
-        sx={{ position: 'relative' }}
-      >
-        <Badge badgeContent={unreadCount} color="error">
-          <NotificationsIcon />
-        </Badge>
-      </IconButton>
+    <Box sx={{ width: '100%', maxWidth: 600, mx: 'auto', mt: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+        <Typography variant="h6" fontWeight="bold">
+          Thông báo ({unreadCount} chưa đọc)
+        </Typography>
+        <Box>
+          <Button 
+            size="small" 
+            onClick={handleMarkAllAsRead}
+            disabled={unreadCount === 0}
+          >
+            Đánh dấu đã đọc
+          </Button>
+          <Button 
+            size="small" 
+            onClick={handleDeleteAll}
+            disabled={notifications.length === 0}
+            color="error"
+          >
+            Xóa tất cả
+          </Button>
+        </Box>
+      </Box>
 
-      {/* Panel thông báo */}
-      {open && (
-        <Box sx={{
-          position: 'absolute',
-          right: 0,
-          top: '100%',
-          width: 350,
-          maxHeight: 500,
-          bgcolor: 'background.paper',
-          boxShadow: 24,
-          borderRadius: 1,
-          overflow: 'hidden',
-          zIndex: 1000
-        }}>
-          {/* Header */}
-          <Box sx={{
-            p: 2,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            bgcolor: 'primary.main',
-            color: 'white'
-          }}>
-            <Typography variant="h6">Thông báo</Typography>
-            <Box>
-              <Button 
-                size="small" 
-                color="inherit"
-                onClick={markAllAsRead}
-                disabled={unreadCount === 0}
+      <List sx={{ p: 0 }}>
+        {notifications.length > 0 ? (
+          notifications.map((notification) => (
+            <React.Fragment key={notification.id}>
+              <ListItem 
+                button
+                onClick={() => handleNotificationClick(notification)}
+                sx={{
+                  bgcolor: notification.read ? 'inherit' : 'action.hover',
+                  '&:hover': { bgcolor: 'action.selected' }
+                }}
               >
-                Đánh dấu đã đọc
-              </Button>
-              <Button 
-                size="small" 
-                color="inherit"
-                onClick={clearAllNotifications}
-                disabled={notifications.length === 0}
-              >
-                Xóa tất cả
-              </Button>
-            </Box>
-          </Box>
-
-          {/* Danh sách thông báo */}
-          <List sx={{ 
-            maxHeight: 400,
-            overflowY: 'auto',
-            '&::-webkit-scrollbar': { width: '6px' },
-            '&::-webkit-scrollbar-thumb': { bgcolor: 'grey.400' }
-          }}>
-            {notifications.length === 0 ? (
-              <ListItem>
-                <ListItemText 
-                  primary="Không có thông báo nào" 
-                  sx={{ textAlign: 'center', color: 'text.secondary' }}
+                <ListItemAvatar>
+                  <Badge
+                    overlap="circular"
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    badgeContent={getNotificationIcon(notification.type)}
+                  >
+                    <Avatar src={notification.avatar} />
+                  </Badge>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Typography fontWeight={notification.read ? 'normal' : 'bold'}>
+                        {notification.title}
+                      </Typography>
+                      {!notification.read && (
+                        <Chip 
+                          label="Mới" 
+                          size="small" 
+                          sx={{ ml: 1, height: '16px' }} 
+                          color="error"
+                        />
+                      )}
+                    </Box>
+                  }
+                  secondary={
+                    <>
+                      <Typography variant="body2">
+                        {notification.message}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {notification.time}
+                      </Typography>
+                    </>
+                  }
                 />
               </ListItem>
-            ) : (
-              notifications.map((notification) => (
-                <React.Fragment key={notification.id}>
-                  <ListItem 
-                    sx={{ 
-                      bgcolor: notification.read ? 'inherit' : 'action.hover',
-                      '&:hover': { bgcolor: 'action.selected' },
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => handleOpenDetail(notification)}
-                  >
-                    <ListItemAvatar>
-                      <Avatar 
-                        src={notification.avatar}
-                        sx={{ 
-                          bgcolor: getTypeColor(notification.type),
-                          width: 40, 
-                          height: 40 
-                        }}
-                      >
-                        {notification.title.charAt(0)}
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={notification.title}
-                      secondary={
-                        <>
-                          <Typography
-                            component="span"
-                            variant="body2"
-                            color="text.primary"
-                            display="block"
-                          >
-                            {notification.message}
-                          </Typography>
-                          <Typography
-                            component="span"
-                            variant="caption"
-                            color="text.secondary"
-                          >
-                            {notification.time}
-                          </Typography>
-                        </>
-                      }
-                    />
-                    <IconButton 
-                      edge="end" 
-                      aria-label="delete"
-                      onClick={(e) => {
-                        e.stopPropagation(); // Ngăn không cho sự kiện click lan ra ListItem
-                        deleteNotification(notification.id);
-                      }}
-                    >
-                      <CloseIcon fontSize="small" />
-                    </IconButton>
-                  </ListItem>
-                  <Divider variant="inset" component="li" />
-                </React.Fragment>
-              ))
-            )}
-          </List>
-        </Box>
-      )}
+              <Divider variant="inset" component="li" />
+            </React.Fragment>
+          ))
+        ) : (
+          <ListItem>
+            <ListItemText
+              primary="Không có thông báo nào"
+              secondary="Bạn sẽ thấy thông báo mới ở đây"
+              sx={{ textAlign: 'center', py: 2 }}
+            />
+          </ListItem>
+        )}
+      </List>
 
-      {/* Modal xem chi tiết thông báo */}
-      <Dialog open={open && !!selectedNotification} onClose={handleCloseDetail} maxWidth="sm" fullWidth>
-        <DialogTitle>{selectedNotification?.title}</DialogTitle>
-        <DialogContent dividers>
-          <Typography variant="body1" gutterBottom>
-            {selectedNotification?.message}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {selectedNotification?.time}
-          </Typography>
+      {/* Dialog xem chi tiết thông báo */}
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {selectedNotification && getNotificationIcon(selectedNotification.type)}
+            <Typography variant="h6" sx={{ ml: 1 }}>
+              {selectedNotification?.title}
+            </Typography>
+          </Box>
+          <IconButton onClick={handleCloseDialog}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Avatar 
+              src={selectedNotification?.avatar} 
+              sx={{ width: 56, height: 56, mr: 2 }}
+            />
+            <Box>
+              <Typography variant="subtitle1" gutterBottom>
+                {selectedNotification?.message}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {selectedNotification?.time}
+              </Typography>
+            </Box>
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDetail} color="primary">
-            Đóng
+          <Button onClick={handleCloseDialog}>Đóng</Button>
+          <Button 
+            variant="contained" 
+            onClick={handleCloseDialog}
+            color="primary"
+          >
+            Xem chi tiết
           </Button>
         </DialogActions>
       </Dialog>

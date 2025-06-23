@@ -1,5 +1,5 @@
 import { Avatar, Card, CardHeader } from '@mui/material';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { searchUser } from '../../Redux/Auth/auth.action';
 import { createChat } from '../../Redux/Message/message.action';
@@ -7,6 +7,7 @@ import { createChat } from '../../Redux/Message/message.action';
 const SearchUser = () => {
   const [username, setUsername] = useState("");
   const dispatch = useDispatch();
+  const typingTimeoutRef = useRef(null);
   
   // Lấy dữ liệu từ Redux
   const { message,auth } = useSelector((store) => store);
@@ -17,7 +18,16 @@ const SearchUser = () => {
   const handleSearchUser = (e) => {
     const value = e.target.value;
     setUsername(value);
-    dispatch(searchUser(username));
+
+    if(typingTimeoutRef.current){
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      if(value.trim() !== ""){
+        dispatch(searchUser(value));
+      }
+    },2500)
   };
 
   // Gọi API tạo chat
@@ -46,7 +56,7 @@ const SearchUser = () => {
         <input 
           type="text" 
           placeholder="Tìm kiếm bạn bè"
-          className="outline-none w-full px-5 py-3 bg-transparent border-[#3b4054] border rounded-full"
+          className="outline-none w-full px-5 py-3 bg-transparent border-2 border-black rounded-lg"
           onChange={handleSearchUser}
           value={username}
         />
@@ -59,7 +69,7 @@ const SearchUser = () => {
                 handleClick(item.id);
                 setUsername(""); // Xóa ô tìm kiếm sau khi chọn user
               }}
-              avatar={<Avatar src={item.avatar || "https://via.placeholder.com/50"} />}
+              avatar={<Avatar src={item.profilePicture || "https://via.placeholder.com/50"} />}
               title={`${item.firstName} ${item.lastName}`}
               subheader={item.firstName.toLowerCase() + " " + item.lastName.toLowerCase()}
             />

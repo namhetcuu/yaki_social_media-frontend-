@@ -56,7 +56,7 @@ export const fetchUserProfile = () => async (dispatch) => {
 };
 
 // 🔹 Login Action
-export const loginUserAction = (loginData, navigate) => async (dispatch) => {
+export const loginUserAction = (loginData, navigate, onSuccess, onError) => async (dispatch) => {
   //có tác dụng gửi một action đến Redux store để thông báo rằng một hành động đã xảy ra.
   //dispatch là hàm do Redux cung cấp để gửi các action đến store.
   dispatch({ type: LOGIN_REQUEST });
@@ -74,10 +74,13 @@ export const loginUserAction = (loginData, navigate) => async (dispatch) => {
     await dispatch(fetchUserProfile());
     await dispatch(getAllPostAction());
 
+    onSuccess?.(); // 👈 Gọi callback nếu có
     navigate("/home");
   } catch (error) {
     console.error("❌ Login Error:", error.response?.data?.message || error.message);
     dispatch({ type: LOGIN_FAILURE, payload: error.message });
+
+    onError?.(error.message); // 👈 Gọi callback nếu có lỗi
   }
 };
 
@@ -161,5 +164,24 @@ export const searchUser = (query) => async (dispatch) => {
     dispatch({ type: SEARCH_USER_FAILURE, payload: error.message });
   }
 };
+
+export const forgotPasswordAction = (email, callback) => async () => {
+  try {
+    const res = await api.post('/auth/forgot-password', { email });
+    callback(res.data.message, true);
+  } catch (error) {
+    callback(error.response?.data?.message || 'Failed to send reset link', false);
+  }
+};
+
+export const resetPasswordAction = (token, newPassword, callback) => async () => {
+  try {
+    const res = await api.post(`/auth/reset-password/${token}`, { password: newPassword });
+    callback(res.data.message, true);
+  } catch (error) {
+    callback(error.response?.data?.message || 'Failed to reset password', false);
+  }
+};
+
 
 

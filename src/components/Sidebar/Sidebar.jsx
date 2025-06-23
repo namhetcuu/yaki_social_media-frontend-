@@ -38,7 +38,7 @@ const Sidebar = () => {
     { title: 'Notifications', icon: <NotificationsIcon />, path: '/home/notifications' },
     { title: 'Message', icon: <MessageIcon />, path: '/message' },
     { title: 'Chat with AI', icon: <Face5Icon />, path: '/chatwithai' },
-    { title: 'Communities', icon: <GroupIcon />, path: '/communities' },
+    { title: 'Communities', icon: <GroupIcon />, path: '/home/communities' },
     { title: 'Profile', icon: <AccountCircleIcon />, path: `/home/profile/${userId}` },
   ];
 
@@ -56,10 +56,10 @@ const Sidebar = () => {
   };
 
   return (
-    <Card className='h-screen flex flex-col justify-between py-5' style={{ padding: 5 }}>
+    <Card className='h-screen flex flex-col justify-between bg-white py-5' style={{ padding: 5 }}>
       <div className='space-y-8 pl-5'>
         <div className='text-center'>
-          <span className='font-bold text-5xl' 
+          <span className='font-bold text-5xl tracking-wide text-black select-none' 
           >Yaki</span>
         </div>
 
@@ -68,7 +68,7 @@ const Sidebar = () => {
             <div 
               key={index} 
               onClick={() => navigate(item.path)} 
-              className='flex items-center space-x-4 cursor-pointer p-2 hover:bg-gray-200 rounded'
+              className='flex items-center space-x-4 cursor-pointer p-2 rounded border-1 border-black transition-all shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:shadow-none duration-200 select-none'
             >
               <span className='text-2xl'>{item.icon}</span>
               <span className='text-lg'>{item.title}</span>

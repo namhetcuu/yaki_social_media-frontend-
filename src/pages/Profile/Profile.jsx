@@ -29,84 +29,82 @@ const Profile = () => {
 
   useEffect(() => {
     if (userId) {
-      console.log("🚀 Fetching user posts for userId:", userId);
       dispatch(getUsersPostAction(userId));
     }
   }, [dispatch, userId]);
 
-  useEffect(() => {
-    console.log("📌 Updated userPosts:", userPosts);
-  }, [userPosts]);
-
   return (
-    <Card className="my-10 w-[95%]">
-      <div className="rounded-md">
-        <div className="h-[15rem]">
-          <img className="w-full h-full rounded-t-md" src="https://images.pexels.com/photos/31120801/pexels-photo-31120801/free-photo-of-phong-c-nh-bai-bi-n-tuy-t-d-p-v-i-d-o-rocky.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" alt="cover" />
-        </div>
+    <div className="my-10 mx-auto w-[95%] bg-white border-2 border-black rounded-md">
+      <div className="h-[15rem] border-b-2 border-black">
+        <img className="w-full h-full object-cover rounded-t-md" src="https://images.pexels.com/photos/31120801/pexels-photo-31120801/free-photo-of-phong-c-nh-bai-bi-n-tuy-t-d-p-v-i-d-o-rocky.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load" alt="cover" />
+      </div>
 
-        <div className="px-5 flex justify-between items-start mt-5 h-[5rem]">
-          <Avatar className="transform -translate-y-24" sx={{ width: '10rem', height: '10rem' }} src={`${user.profilePicture}`} />
-          <Button
-            sx={{ borderRadius: '20rem', transition: '0.3s', '&:hover': { transform: 'scale(1.05)' }, '&:active': { transform: 'scale(0.95)' } }}
-            variant="outlined"
-            onClick={handleOpen}
-          >
-            Edit Profile
-          </Button>
-        </div>
+      <div className="flex justify-between items-start px-6 mt-5 h-[5rem]">
+        <Avatar className="transform -translate-y-24 border-2 border-black" sx={{ width: '10rem', height: '10rem' }} src={`${user.profilePicture}`} />
+        <button
+          onClick={handleOpen}
+          className="border-2 border-black px-6 py-2 font-bold uppercase rounded-lg shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:shadow-none cursor-pointer transition duration-300"
+        >
+          Edit Profile
+        </button>
+      </div>
 
-        <div className="p-5">
-          <h1 className="py-1 font-bold text-2xl">{`${user.firstName} ${user.lastName}`}</h1>
-          <p>@{`${user.firstName}-${user.lastName}`.toLowerCase()}</p>
-          <div className="flex gap-5 items-center py-3">
-            <span>41 posts</span>
-            <span>35 followers</span>
-            <span>5 followings</span>
+      <div className="p-6 text-black">
+        <h1 className="font-bold text-3xl">{`${user.firstName} ${user.lastName}`}</h1>
+        <p className="text-sm font-mono">@{`${user.firstName}-${user.lastName}`.toLowerCase()}</p>
+        <div className="flex gap-6 items-center py-3 font-semibold">
+          <span>41 posts</span>
+          <span>35 followers</span>
+          <span>5 followings</span>
+        </div>
+        <p className="italic text-gray-600">Lorem ipsum dolor sit amet consectetur adipisicing elit...</p>
+      </div>
+
+      <div className="border-t-2 border-black px-6">
+        <div className="flex gap-4 text-center justify-around mt-4 font-bold text-black uppercase">
+          {tabs.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setValue(tab.value)}
+              className={`px-4 py-2 border-2 ${value === tab.value ? 'bg-black text-white' : 'border-black'} rounded-md hover:bg-black hover:text-white transition`}
+            >
+              {tab.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex justify-center my-10">
+        {value === 'post' && (
+          <div className="space-y-5 w-[95%]">
+            {Array.isArray(userPosts) && userPosts.length > 0 ? (
+              userPosts.map((post) =>
+                post ? (
+                  <div key={post.id} className="border-2 border-black rounded-md p-4">
+                    <PostCard item={post} />
+                  </div>
+                ) : (
+                  <p key={Math.random()} className="text-center text-red-600 font-bold">Lỗi: Bài viết không hợp lệ</p>
+                )
+              )
+            ) : (
+              <p className="text-center font-mono">Người dùng chưa có bài viết nào.</p>
+            )}
           </div>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit...</p>
-        </div>
-
-        <Box sx={{ width: '100%', borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={value} onChange={handleChange} aria-label="wrapped label tabs example">
-            {tabs.map((item) => (
-              <Tab key={item.value} value={item.value} label={item.name} />
-            ))}
-          </Tabs>
-        </Box>
-
-        <div className="flex justify-center my-10">
-          {value === 'post' && (
-            <div className="space-y-5 w-[95%]">
-              {Array.isArray(userPosts) && userPosts.length > 0 ? (
-                userPosts.map((post) => (
-                  post ? (
-                    <div key={post.id} className="border border-gray-200 rounded-md">
-                      <PostCard item={post} />
-                    </div>
-                  ) : (
-                    <p key={Math.random()} className="text-center text-red-500">Lỗi: Bài viết không hợp lệ</p>
-                  )
-                ))
-              ) : (
-                <p className="text-center">Người dùng chưa có bài viết nào.</p>
-              )}
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
       <Modal open={open} onClose={handleClose} closeAfterTransition>
         <Fade in={open}>
-          <div className="bg-white p-5 rounded-lg shadow-lg w-[400px] mx-auto mt-20 relative">
-            <IconButton onClick={handleClose} className="absolute top-2 right-2">
+          <div className="bg-white p-5 border-2 border-black rounded-md w-[400px] mx-auto mt-20 relative">
+            <IconButton onClick={handleClose} className="absolute top-2 right-2 text-black">
               <Close />
             </IconButton>
             <ProfileModal open={open} handleClose={handleClose} user={user} />
           </div>
         </Fade>
       </Modal>
-    </Card>
+    </div>
   );
 };
 

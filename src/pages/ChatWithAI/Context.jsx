@@ -11,11 +11,16 @@ const ContextProvider = (props) => {
   const [loading, setLoading] = useState(false);
   const [resultData, setResultData] = useState("");
 
+  // const delayPara = (index, nextWord) => {
+  //   setTimeout(() => {
+  //     setResultData((prev) => prev + nextWord);
+  //   }, 75 * index);
+  // };
   const delayPara = (index, nextWord) => {
     setTimeout(() => {
-      setResultData((prev) => prev + nextWord);
-    }, 75 * index);
-  };
+      setResultData((prev) => prev+nextWord);
+    }, 75 * index)
+  }
 
   const newChat = () => {
     setInput("");

@@ -5,7 +5,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 const UserChatCard = ({ chat, chatName }) => {
 
   return (
-    <Card sx={{ marginBottom: "10px", cursor: "pointer" }}>
+    <Card sx={{ marginBottom: "10px", cursor: "pointer", borderRadius: "3px", boxShadow: "4px 4px 0px rgba(0,0,0,1)", border: "1px solid #191c29",  }}>
       <CardHeader
         action={
           <IconButton>

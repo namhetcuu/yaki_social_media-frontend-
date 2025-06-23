@@ -1,5 +1,4 @@
 import React from 'react';
-import { Avatar, Button, Divider, TextField, Typography, Card } from '@mui/material';
 import { useSelector } from 'react-redux';
 
 const Setting = () => {
@@ -8,7 +7,8 @@ const Setting = () => {
     firstName: 'Guest',
     lastName: 'User',
     email: 'guest@example.com',
-    profilePicture: 'https://via.placeholder.com/150'
+    profilePicture: 'https://via.placeholder.com/150',
+    location: 'Unknown'
   };
 
   const handleSave = () => {
@@ -16,94 +16,99 @@ const Setting = () => {
   };
 
   return (
-    <div className="flex justify-center items-start min-h-screen bg-gray-100 py-10 px-4">
-      <Card className="w-full max-w-3xl p-8 rounded-2xl shadow-md">
+    <div className="min-h-screen bg-[#f3f3f3] p-6 flex justify-center items-start">
+      <div className="w-full max-w-3xl bg-white border-2 border-black shadow-[6px_6px_0_0_black] p-8">
+        
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <Typography variant="h5" className="font-semibold">
-            Account Settings
-          </Typography>
-          <Button variant="contained" color="primary" onClick={handleSave}>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-black">Account Settings</h1>
+          <button
+            onClick={handleSave}
+            className="bg-yellow-400 text-black px-5 py-2 border-2 border-black shadow-[2px_2px_0_0_black] cursor-pointer hover:shadow-none hover:bg-yellow-300 active:shadow-none active:translate-x-0.5 active:translate-y-0.5"
+          >
             Save Changes
-          </Button>
+          </button>
         </div>
 
-        <Divider className="mb-6" />
+        <hr className="border-black mb-6" />
 
         {/* Profile Info */}
         <div className="flex items-center space-x-5 mb-8">
-          <Avatar
+          <img
             src={user.profilePicture}
-            alt="Profile Picture"
-            sx={{ width: 80, height: 80 }}
+            alt="Profile"
+            className="w-20 h-20 object-cover border-2 border-black shadow-[2px_2px_0_0_black]"
           />
           <div>
-            <Typography variant="h6" className="font-bold">
-              {user.firstName} {user.lastName}
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              @{user.firstName.toLowerCase()}_{user.lastName.toLowerCase()}
-            </Typography>
+            <h2 className="text-xl font-bold text-black">{user.firstName} {user.lastName}</h2>
+            <p className="text-sm text-gray-600">@{user.firstName.toLowerCase()}_{user.lastName.toLowerCase()}</p>
           </div>
         </div>
 
         {/* Form Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <TextField
-            label="First Name"
-            fullWidth
-            defaultValue={user.firstName}
-            variant="outlined"
-          />
-          <TextField
-            label="Last Name"
-            fullWidth
-            defaultValue={user.lastName}
-            variant="outlined"
-          />
-          <TextField
-            label="Email"
-            type="email"
-            fullWidth
-            defaultValue={user.email}
-            variant="outlined"
-          />
-          <TextField
-            label=""
-            fullWidth
-            defaultValue={user.location || ''}
-            variant="outlined"
-            type='tel'
-          />
+          <div>
+            <label className="block font-bold text-sm mb-1">First Name</label>
+            <input
+              defaultValue={user.firstName}
+              className="w-full p-2 border-2 border-black bg-white text-black font-medium shadow-[2px_2px_0_0_black] focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block font-bold text-sm mb-1">Last Name</label>
+            <input
+              defaultValue={user.lastName}
+              className="w-full p-2 border-2 border-black bg-white text-black font-medium shadow-[2px_2px_0_0_black] focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block font-bold text-sm mb-1">Email</label>
+            <input
+              type="email"
+              defaultValue={user.email}
+              className="w-full p-2 border-2 border-black bg-white text-black font-medium shadow-[2px_2px_0_0_black] focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block font-bold text-sm mb-1">Location</label>
+            <input
+              defaultValue={user.location}
+              className="w-full p-2 border-2 border-black bg-white text-black font-medium shadow-[2px_2px_0_0_black] focus:outline-none"
+            />
+          </div>
         </div>
 
         {/* Password Section */}
-        <Divider className="my-8" />
-        <Typography variant="h6" className="font-semibold mb-4">
-          Security
-        </Typography>
+        <hr className="border-black my-8" />
+        <h2 className="text-xl font-bold text-black mb-4">Security</h2>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <TextField
-            label="New Password"
-            type="password"
-            fullWidth
-            variant="outlined"
-          />
-          <TextField
-            label="Confirm Password"
-            type="password"
-            fullWidth
-            variant="outlined"
-          />
+          <div>
+            <label className="block font-bold text-sm mb-1">New Password</label>
+            <input
+              type="password"
+              className="w-full p-2 border-2 border-black bg-white text-black font-medium shadow-[2px_2px_0_0_black] focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block font-bold text-sm mb-1">Confirm Password</label>
+            <input
+              type="password"
+              className="w-full p-2 border-2 border-black bg-white text-black font-medium shadow-[2px_2px_0_0_black] focus:outline-none"
+            />
+          </div>
         </div>
 
-        {/* Save Button Bottom (Mobile Friendly) */}
-        <div className="mt-10 flex justify-end md:hidden">
-          <Button variant="contained" color="primary" onClick={handleSave} fullWidth>
+        {/* Mobile Save Button */}
+        <div className="mt-10 md:hidden">
+          <button
+            onClick={handleSave}
+            className="w-full bg-yellow-400 text-black px-4 py-2 border-2 border-black shadow-[2px_2px_0_0_black] hover:shadow-none hover:bg-yellow-300 active:shadow-none active:translate-x-0.5  active:translate-y-0.5"
+          >
             Save Changes
-          </Button>
+          </button>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };

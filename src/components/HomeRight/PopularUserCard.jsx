@@ -1,5 +1,4 @@
-import { Avatar, Button, Box } from '@mui/material';
-import { red } from '@mui/material/colors';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { followUser, getUserWithFollowStatus, unfollowUser } from '../../Redux/Users/user.action';
 
@@ -10,122 +9,47 @@ const PopularUserCard = ({ user }) => {
 
   const handleFollowToggle = () => {
     if (!currentUser?.id || !user?.id) return;
-    followed 
+    followed
       ? dispatch(unfollowUser(currentUser.id, user.id))
       : dispatch(followUser(currentUser.id, user.id));
-    
+
     setTimeout(() => dispatch(getUserWithFollowStatus(currentUser.id)), 300);
   };
 
   return (
-    <Box sx={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      width: '100%', // Hoặc width cố định nếu muốn
-      minWidth: '300px', // Thiết lập chiều rộng tối thiểu
-      maxWidth: '100%', // Giới hạn chiều rộng tối đa
-      overflowX: 'auto', // Quan trọng: cho phép cuộn ngang khi nội dung tràn
-      scrollbarWidth: 'thin', // Kiểu thanh cuộn
-      '&::-webkit-scrollbar': { // Tùy chỉnh cho trình duyệt WebKit
-        height: '6px',
-      },
-      '&::-webkit-scrollbar-thumb': {
-        backgroundColor: 'text.secondary',
-        borderRadius: '3px',
-      },
-      py: 1.5,
-      px: 2,
-      boxSizing: 'border-box',
-      '&:hover': {
-        backgroundColor: 'action.hover',
-        borderRadius: 1
-      }
-    }}>
-      {/* Phần bên trái - Avatar và thông tin */}
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        flex: 1,
-        minWidth: 0,
-        overflow: 'hidden',
-        mr: 2
-      }}>
-        <Avatar 
-          sx={{ 
-            width: { xs: 48, sm: 56 },
-            height: { xs: 48, sm: 56 },
-            bgcolor: red[500],
-            mr: 2,
-            flexShrink: 0
-          }}
-          src={user?.avatar}
-        >
-          {user?.username?.charAt(0).toUpperCase() || 'U'}
-        </Avatar>
-
-        <Box sx={{
-          minWidth: 0,
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center'
-        }}>
-          <Box sx={{
-            fontWeight: 'bold',
-            fontSize: { xs: '0.875rem', sm: '0.9375rem' },
-            lineHeight: 1.2,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-          }}>
+    <div className="flex items-center justify-between w-full min-w-[300px] px-4 py-3 border-2 border-black hover:bg-gray-100 transition-all duration-150">
+      
+      {/* Left - Avatar + Info */}
+      <div className="flex items-center space-x-3 overflow-hidden">
+        <img
+          src={user?.avatar || `https://via.placeholder.com/56`}
+          alt="avatar"
+          className="w-14 h-14 rounded-full border-2 border-black object-cover bg-red-500 flex-shrink-0"
+        />
+        <div className="overflow-hidden">
+          <p className="font-bold text-sm sm:text-base truncate">
             {user?.username || 'Anonymous'}
-          </Box>
-          <Box sx={{
-            color: 'text.secondary',
-            fontSize: { xs: '0.75rem', sm: '0.8125rem' },
-            lineHeight: 1.2,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            mt: 0.5
-          }}>
+          </p>
+          <p className="text-gray-500 text-xs sm:text-sm truncate mt-1">
             @{(user?.username || 'user').toLowerCase().replace(/\s+/g, '')}
-          </Box>
-        </Box>
-      </Box>
+          </p>
+        </div>
+      </div>
 
-      {/* Nút Follow bên phải */}
-      <Box sx={{
-        flexShrink: 0,
-        ml: 'auto'
-      }}>
-        <Button
-          variant={followed ? 'outlined' : 'contained'}
-          size="small"
-          sx={{
-            borderRadius: 6,
-            fontSize: { xs: '0.75rem', sm: '0.8125rem' },
-            fontWeight: 'bold',
-            textTransform: 'none',
-            px: { xs: 1.5, sm: 2.5 },
-            py: 0.5,
-            minWidth: { xs: 80, sm: 96 },
-            height: { xs: 32, sm: 36 },
-            backgroundColor: followed ? 'transparent' : '#0866ff',
-            color: followed ? 'text.primary' : 'white',
-            borderColor: followed ? 'action.disabled' : 'transparent',
-            '&:hover': {
-              backgroundColor: followed ? 'action.hover' : '#1877f2',
-              borderColor: followed ? 'action.disabled' : 'transparent'
-            }
-          }}
+      {/* Right - Follow Button */}
+      <div className="ml-auto">
+        <button
           onClick={handleFollowToggle}
+          className={`text-xs cursor-pointer sm:text-sm font-bold px-4 py-1.5 border-2 transition-all duration-200
+            ${followed
+              ? 'bg-white text-black border-black hover:bg-gray-200 shadow-[4px_4px_0px_#000] rounded-md hover:shadow-none'
+              : 'bg-blue-600 text-white border-black hover:bg-blue-700 shadow-[4px_4px_0px_#000] rounded-md hover:shadow-none'}
+          `}
         >
           {followed ? 'Following' : 'Follow'}
-        </Button>
-      </Box>
-    </Box>
+        </button>
+      </div>
+    </div>
   );
 };
 
